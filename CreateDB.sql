@@ -1,0 +1,117 @@
+DROP SCHEMA PROJECTDB;
+
+CREATE DATABASE PROJECTDB;
+
+use PROJECTDB;
+
+CREATE TABLE MEDIA_SERVERS (
+	Server_id INT NOT NULL,
+	IP INT UNSIGNED NOT NULL,
+	Port INT NOT NULL,
+	CONSTRAINT MS_PK PRIMARY KEY(Server_id)
+);
+
+CREATE TABLE TV_MOVIES (
+	TV_Movie_id INT NOT NULL,
+	TV_Movie_name VARCHAR(100) NOT NULL,
+	CONSTRAINT TV_MOVIES_PK PRIMARY KEY(TV_Movie_id)
+);
+
+CREATE TABLE CATEGORIES (
+	Category_id INT NOT NULL,
+	Category_name VARCHAR(50) NOT NULL,
+	CONSTRAINT CAT_PK PRIMARY KEY(Category_id)
+);
+
+CREATE TABLE AVAILABLE_TV_MOVIES (
+	TV_Movie_id INT NOT NULL,
+	Server_id INT NOT NULL,
+	URL VARCHAR(100) NOT NULL,
+	CONSTRAINT AVAIL_TVMV_PK PRIMARY KEY(TV_Movie_id, Server_id),
+	CONSTRAINT AVAIL_TVMV_TVMOVIE_FK FOREIGN KEY(TV_Movie_id) REFERENCES TV_MOVIES(TV_Movie_id),
+	CONSTRAINT AVAIL_TVMV_SERVER_FK FOREIGN KEY(Server_id) REFERENCES MEDIA_SERVERS(Server_id)
+);
+
+CREATE TABLE TV_MOVIE_CATEGORY (
+	TV_Movie_id INT NOT NULL,
+	Category_id INT NOT NULL,
+	CONSTRAINT TVMV_CAT_PK PRIMARY KEY(TV_Movie_id, Category_id),
+	CONSTRAINT TVMV_CAT_MOVIE_FK FOREIGN KEY(TV_Movie_id) REFERENCES TV_MOVIES(TV_Movie_id),
+	CONSTRAINT TVMV_CAT_CATEGORY_FK FOREIGN KEY(Category_id) REFERENCES CATEGORIES(Category_id)
+);
+
+
+-- Create user to run appropriate commands from Media Server threads
+CREATE USER 'MSuser'@'localhost' IDENTIFIED BY 'MSpassword';
+GRANT INSERT,DELETE,UPDATE,SELECT ON PROJECTDB.* TO 'MSuser'@'localhost';
+
+-- Create user to run appropriate commands (SELECT) from Client User threads
+CREATE USER 'ClientUser'@'localhost' IDENTIFIED BY 'ClientPassword';
+GRANT SELECT ON PROJECTDB.* TO 'ClientUser'@'localhost';
+
+
+-- verify grants
+show grants for 'MSuser'@'localhost';
+show grants for 'ClientUser'@'localhost';
+
+
+
+
+
+use PROJECTDB;
+
+
+INSERT INTO MEDIA_SERVERS VALUES(1, INET_ATON('127.0.0.1'), 4092);
+INSERT INTO MEDIA_SERVERS VALUES(2, INET_ATON('127.0.0.2'), 32005);
+
+INSERT INTO CATEGORIES VALUES(1, 'Sci Fi');
+INSERT INTO CATEGORIES VALUES(2, 'Horror');
+INSERT INTO CATEGORIES VALUES(3, 'Drama');
+INSERT INTO CATEGORIES VALUES(4, 'Romance');
+INSERT INTO CATEGORIES VALUES(5, 'Comedy');
+
+INSERT INTO TV_MOVIES VALUES(1, 'Star Wars');
+INSERT INTO TV_MOVIES VALUES(2, 'Scream');
+INSERT INTO TV_MOVIES VALUES(3, 'Friends');
+INSERT INTO TV_MOVIES VALUES(4, 'The Notebook');
+INSERT INTO TV_MOVIES VALUES(5, 'How I Met Your Mother');
+
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(1, 1, "Server1 URL for Movie 1");
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(2, 1, "Server1 URL for Movie 2");
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(2, 2, "Server2 URL for Movie 2");
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(3, 2, "Server2 URL for Movie 3");
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(4, 2, "Server2 URL for Movie 4");
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(5, 1, "Server1 URL for Movie 5");
+INSERT INTO AVAILABLE_TV_MOVIES VALUES(5, 2, "Server2 URL for Movie 5");
+
+INSERT INTO TV_MOVIE_CATEGORY VALUES(1,1);
+INSERT INTO TV_MOVIE_CATEGORY VALUES(2,2);
+INSERT INTO TV_MOVIE_CATEGORY VALUES(3,3);
+INSERT INTO TV_MOVIE_CATEGORY VALUES(4,4);
+INSERT INTO TV_MOVIE_CATEGORY VALUES(5,5);
+
+
+
+
+
+
+
+SELECT INET_NTOA(IP) FROM MEDIA_SERVERS;
+
+-- Display full list, unsorted
+SELECT TV.TV_Movie_name, INET_NTOA(MS.IP), MS.Port, Cat.Category_name, Avail.URL FROM MEDIA_SERVERS MS, TV_MOVIES TV, CATEGORIES Cat, AVAILABLE_TV_MOVIES Avail, TV_MOVIE_CATEGORY TV_cat WHERE MS.Server_id=Avail.Server_id AND TV.TV_Movie_id=Avail.TV_Movie_id AND TV.TV_Movie_id=TV_cat.TV_Movie_id AND Cat.Category_id=TV_cat.Category_id;
+
+
+-- Display full list, sorted
+SELECT TV.TV_Movie_name, INET_NTOA(MS.IP), MS.Port, Cat.Category_name, Avail.URL FROM MEDIA_SERVERS MS, TV_MOVIES TV, CATEGORIES Cat, AVAILABLE_TV_MOVIES Avail, TV_MOVIE_CATEGORY TV_cat WHERE MS.Server_id=Avail.Server_id AND TV.TV_Movie_id=Avail.TV_Movie_id AND TV.TV_Movie_id=TV_cat.TV_Movie_id AND Cat.Category_id=TV_cat.Category_id ORDER BY TV_Movie_name, MS.IP;
+
+
+-- GROUP_CONCAT IP and URL into comma-separated
+SELECT TV.TV_Movie_name, GROUP_CONCAT(INET_NTOA(MS.IP)), GROUP_CONCAT(MS.Port), Cat.Category_name, GROUP_CONCAT(Avail.URL) FROM MEDIA_SERVERS MS, TV_MOVIES TV, CATEGORIES Cat, AVAILABLE_TV_MOVIES Avail, TV_MOVIE_CATEGORY TV_cat WHERE MS.Server_id=Avail.Server_id AND TV.TV_Movie_id=Avail.TV_Movie_id AND TV.TV_Movie_id=TV_cat.TV_Movie_id AND Cat.Category_id=TV_cat.Category_id GROUP BY TV_Movie_name, Category_name ORDER BY TV_Movie_name;
+
+
+
+
+##### Need to verify input to make sure within VARCHAR size for each field
+##### Need to keep track of indices in each table (need to run appropriate INSERTs for that index before moving on)
+
