@@ -63,7 +63,7 @@ public class Update {
 		System.out.println("\nError. Media Could not be removed. Try again");
 		}
 		else{
-		System.out.println("\nMedia "+media+" removed from Media List");	
+		System.out.println("\nUpdate Successful");	
 		}
 		break;
 	}
