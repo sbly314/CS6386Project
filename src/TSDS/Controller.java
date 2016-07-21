@@ -179,7 +179,7 @@ class clientThread extends Thread {
 		System.out.println(Controller.mediaList[i]);
 	  }
 	  System.out.println("\nSending FIN");
-	  os.println("FIN");
+	  os.println("FIN "+temp[1]);
 	  break;
 	  }
 	  int remove=0;
