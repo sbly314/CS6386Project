@@ -1,5 +1,3 @@
-package sysdproject;
-
 import java.io.DataInputStream;
 import java.io.PrintStream;
 import java.io.IOException;
@@ -104,6 +102,7 @@ class clientThread extends Thread {
     int maxClientsCount = this.maxClientsCount;
     clientThread[] threads = this.threads;
 	DBControllerMS dbController = new DBControllerMS();
+	DBControllerUser dbUser = new DBControllerUser();
 	InetAddress IP = null;
     try {
 
@@ -170,6 +169,19 @@ class clientThread extends Thread {
 	  int found=0;
 	  if(message.equals("search")){
 	  System.out.println("\nSearching "+temp[1]+" in media list\n");
+	  String temp2[]=temp[1].split("-");
+	  if(temp2[1].equals("ALL")){
+		  dbUser.dbParser(dbUser.queryAll()); // Query All
+	  }
+	  else {
+		  if(temp2[0].equals("null")){
+				dbUser.dbParser(dbUser.queryCriteria(temp2[1], null)); // Category-only
+		  }
+		  else{
+			    dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
+		  }
+	  }
+	  
 	  for(int i=0;i<Controller.size;i++){
 		if(temp[1].equals(Controller.mediaList[i])){
 		System.out.println("Match found. Sending Media");
@@ -503,7 +515,7 @@ class DBControllerMS {
 				}
 				
 				// Insert that this movie is available on this server into AVAILABLE_TV_MOVIES
-				insertAvailableMovieServer = "INSERT INTO AVAILABLE_TV_MOVIES VALUES(" + tvMovieID + ", " + serverID + ", '');";
+				insertAvailableMovieServer = "INSERT INTO AVAILABLE_TV_MOVIES VALUES(" + tvMovieID + ", " + serverID + ");";
 				stat.executeUpdate(insertAvailableMovieServer);
 			}
 		} catch (SQLException e) {
@@ -699,6 +711,187 @@ class DBControllerMS {
 	}
 }
 
+class DBControllerUser {
+	private static DBConnection dbConn;
+	
+	public DBControllerUser() {
+		startConnection();
+	}
+
+	/**
+	 * @author Stephen
+	 * 
+	 * Initialize the dbConn variable
+	 * 
+	 */
+	public void startConnection() {
+		//try to read the database.properties file
+        try {
+            dbConn = new DBConnection(1); // 1 indicates User
+            dbConn.readDatabaseProperties();
+        } catch (IOException e) {
+            System.err.println("ERROR: Unable to read Database Properties: " + e);
+            System.exit(1);
+        }
+	}
+	
+	/**
+	 * @author Stephen
+	 * 
+	 * @return Vector<Vector<String>> results - contains results of query; need to validate not null on return
+	 * 
+	 * This method queries the whole database
+	 */
+	public Vector<Vector<String>> queryAll() {
+		Vector<Vector<String>> results = null;
+		
+		String queryAllMovies = "SELECT TV.TV_Movie_name, GROUP_CONCAT(INET_NTOA(MS.IP)), GROUP_CONCAT(MS.Port), Cat.Category_name "
+				+ "FROM MEDIA_SERVERS MS, TV_MOVIES TV, CATEGORIES Cat, "
+				+ "AVAILABLE_TV_MOVIES Avail, TV_MOVIE_CATEGORY TV_cat WHERE MS.Server_id=Avail.Server_id "
+				+ "AND TV.TV_Movie_id=Avail.TV_Movie_id AND TV.TV_Movie_id=TV_cat.TV_Movie_id AND "
+				+ "Cat.Category_id=TV_cat.Category_id GROUP BY TV_Movie_name, Category_name ORDER BY TV_Movie_name;";
+		
+		try {
+			try (Connection conn = dbConn.getConnection()) {
+				Statement stat = conn.createStatement();
+				
+				ResultSet rs = stat.executeQuery(queryAllMovies);
+				
+				results = new Vector<Vector<String>>();
+				
+				while(rs.next()) {
+					Vector<String> row = new Vector<String>(4);
+
+					row.add(rs.getString(1));
+					row.add(rs.getString(2));
+					row.add(rs.getString(3));
+					row.add(rs.getString(4));
+					
+					results.add(row);
+				}
+			}
+		} catch (SQLException e) {
+			for (Throwable t : e)
+				System.err.println("ERROR: " + t.getMessage());
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * @author Stephen
+	 * 
+	 * @param String categoryCrit - contains search criteria for category (null if not used)
+	 * @param String movieNameCrit - contains search criteria for movie name (null if not used)
+	 * 
+	 * @return Vector<Vector<String>> results - contains results of query; need to validate not null on return
+	 * 
+	 * This method queries for specific criteria
+	 */
+	public Vector<Vector<String>> queryCriteria(String categoryCrit, String movieNameCrit) {
+		Vector<Vector<String>> results = null;
+		
+		// base query
+		String queryCriteria = "SELECT TV.TV_Movie_name, GROUP_CONCAT(INET_NTOA(MS.IP)), GROUP_CONCAT(MS.Port), Cat.Category_name "
+				+ "FROM MEDIA_SERVERS MS, TV_MOVIES TV, CATEGORIES Cat, "
+				+ "AVAILABLE_TV_MOVIES Avail, TV_MOVIE_CATEGORY TV_cat WHERE MS.Server_id=Avail.Server_id "
+				+ "AND TV.TV_Movie_id=Avail.TV_Movie_id AND TV.TV_Movie_id=TV_cat.TV_Movie_id AND "
+				+ "Cat.Category_id=TV_cat.Category_id";
+		
+		// add category criteria if available
+		if(categoryCrit != null) {
+			queryCriteria += " AND Cat.Category_name LIKE '%" + categoryCrit + "%'";
+		}
+		
+		// add category criteria if available
+		if(movieNameCrit != null) {
+			queryCriteria += " AND TV.TV_Movie_name LIKE '%" + movieNameCrit + "%'";
+		}
+		
+		// add ending to query
+		queryCriteria +=  " GROUP BY TV_Movie_name, Category_name ORDER BY TV_Movie_name;";
+		
+		try {
+			try (Connection conn = dbConn.getConnection()) {
+				Statement stat = conn.createStatement();
+				
+				ResultSet rs = stat.executeQuery(queryCriteria);
+				
+				results = new Vector<Vector<String>>();
+				
+				while(rs.next()) {
+					Vector<String> row = new Vector<String>(4);
+
+					row.add(rs.getString(1));
+					row.add(rs.getString(2));
+					row.add(rs.getString(3));
+					row.add(rs.getString(4));
+					
+					results.add(row);
+				}
+			}
+		} catch (SQLException e) {
+			for (Throwable t : e)
+				System.err.println("ERROR: " + t.getMessage());
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * @author Stephen
+	 * 
+	 * @param ResultSet rs - contains results of query; need to validate not null
+	 * 
+	 * Need to handle case where ResultSet may be null (connection failed)
+	 * Need to handle case where ResultSet may be empty (No matches found)
+	 * Need to also extract the first value from the comma-separated results
+	 */
+	public void dbParser(Vector<Vector<String>> rs) {
+		if ( rs == null) {
+			System.out.println("Error connecting to database.  Please try again later.");
+		} else if (rs.isEmpty()) {
+			System.out.println("No movies matched your criteria");
+		} else {
+			Enumeration<Vector<String>> eRS = rs.elements();
+			
+			while(eRS.hasMoreElements()) {
+				Enumeration<String> eRow = eRS.nextElement().elements();
+				
+				String movieName = eRow.nextElement();
+				String serverIP = eRow.nextElement();
+				String serverPort = eRow.nextElement();
+				String category = eRow.nextElement();
+				
+				String[] serverIPsplit;
+				String[] serverPortsplit;
+				
+				if (serverIP.contains(",")) {
+					serverIPsplit = serverIP.split(",");
+					serverIP = serverIPsplit[0];
+				}
+				
+				if (serverPort.contains(",")) {
+					serverPortsplit = serverPort.split(",");
+					serverPort = serverPortsplit[0];
+				}
+				
+				
+				
+				// IMPLEMENT JSON CODE HERE
+				
+
+				System.out.println("movieName = " + movieName);
+				System.out.println("serverIP = " + serverIP);
+				System.out.println("serverPort = " + serverPort);
+				System.out.println("category = " + category);
+				System.out.println("---------------------");
+			}
+		}
+	}
+}
+
+
 class DBConnection {
 	private Properties props;
 	private int MSorUser; // 0 for Media Server(MS); 1 for User
@@ -719,7 +912,7 @@ class DBConnection {
         	databasePropertiesName = "databaseForUser.properties";
         }
         
-        try (InputStream in = Files.newInputStream(Paths.get("src", "sysdproject", databasePropertiesName))) {
+        try (InputStream in = Files.newInputStream(Paths.get(databasePropertiesName))) {
            
             props.load(in);
            
@@ -739,3 +932,5 @@ class DBConnection {
         return DriverManager.getConnection(url, username, password);
     }
 }
+
+
