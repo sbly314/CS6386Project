@@ -7,10 +7,21 @@
     android:minHeight="?android:attr/listPreferredItemHeight"
     android:background="@drawable/touch_selector" >
 
-    <TextView
-        android:id="@+id/list_item_medianame_textview"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:textAppearanceLarge" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/list_item_medianame_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceLarge" />
+        <TextView
+            android:id="@+id/list_item_category_textview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:textAppearanceSmall" />
+    </LinearLayout>
+
 
 </LinearLayout>

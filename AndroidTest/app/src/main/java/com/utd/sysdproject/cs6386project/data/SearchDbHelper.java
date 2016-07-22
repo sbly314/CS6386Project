@@ -3,6 +3,7 @@ package com.utd.sysdproject.cs6386project.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.utd.sysdproject.cs6386project.data.SearchContract.MediaEntry;
 
@@ -10,6 +11,8 @@ import com.utd.sysdproject.cs6386project.data.SearchContract.MediaEntry;
  * Manages a local database for the media data.
  */
 public class SearchDbHelper extends SQLiteOpenHelper {
+    private static final String LOG_TAG = SearchDbHelper.class.getSimpleName();
+
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 1;
 
@@ -21,6 +24,8 @@ public class SearchDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        Log.d(LOG_TAG, "FUNCTION: onCreate");
+
         // Create a table to hold locations.  A location consists of the string supplied in the
         // location setting, the city name, and the latitude and longitude
         final String SQL_CREATE_MEDIA_TABLE = "CREATE TABLE " + MediaEntry.TABLE_NAME + " (" +
@@ -35,7 +40,20 @@ public class SearchDbHelper extends SQLiteOpenHelper {
     }
 
     @Override
+    public void onOpen(SQLiteDatabase sqLiteDatabase) {
+        Log.d(LOG_TAG, "FUNCTION: onOpen");
+
+        // Attempt to drop database if previously created
+        final String DROP_SQL = "DROP TABLE IF EXISTS " + MediaEntry.TABLE_NAME + ";";
+        sqLiteDatabase.execSQL(DROP_SQL);
+
+        onCreate(sqLiteDatabase);
+    }
+
+    @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        Log.d(LOG_TAG, "FUNCTION: onUpgrade");
+
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         // Note that this only fires if you change the version number for your database.

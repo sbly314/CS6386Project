@@ -8,18 +8,21 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Created by Stephen on 7/17/2016.
  */
 public class SearchProvider extends ContentProvider {
+    private static final String LOG_TAG = SearchProvider.class.getSimpleName();
+
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private SearchDbHelper mOpenHelper;
 
     // Unique integer constant for each type of query
     static final int SEARCH = 100;
-    static final int SEARCHWITHMEDIANAME = 101;
+    static final int SEARCH_ID = 101;
 
     private static final SQLiteQueryBuilder sSearchQueryBuilder = new SQLiteQueryBuilder();
 
@@ -39,7 +42,7 @@ public class SearchProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, SearchContract.PATH, SEARCH);
-        matcher.addURI(authority, SearchContract.PATH + "/*", SEARCHWITHMEDIANAME);
+        matcher.addURI(authority, SearchContract.PATH + "/#", SEARCH_ID);
 
         return matcher;
     }
@@ -47,6 +50,8 @@ public class SearchProvider extends ContentProvider {
     // Create a new SearchDbHelper for later use
     @Override
     public boolean onCreate() {
+        Log.d(LOG_TAG, "FUNCTION: onCreate");
+
         mOpenHelper = new SearchDbHelper(getContext());
         return true;
     }
@@ -54,16 +59,16 @@ public class SearchProvider extends ContentProvider {
     // getType function that uses UriMatcher
     @Override
     public String getType(Uri uri) {
+        Log.d(LOG_TAG, "FUNCTION: getType");
 
         // Use the Uri Matcher to determine what kind of URI this is.
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
             case SEARCH:
                 return SearchContract.MediaEntry.CONTENT_TYPE;
-            case SEARCHWITHMEDIANAME:
-                return SearchContract.MediaEntry.CONTENT_TYPE;
+            case SEARCH_ID:
+                return SearchContract.MediaEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -72,6 +77,8 @@ public class SearchProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs,
                         String sortOrder) {
+        Log.d(LOG_TAG, "FUNCTION: query");
+
         // Here's the switch statement that, given a URI, will determine what kind of request it is,
         // and query the database accordingly.
         Cursor retCursor;
@@ -79,6 +86,7 @@ public class SearchProvider extends ContentProvider {
             // "search"
             case SEARCH:
             {
+                Log.d(LOG_TAG, "sUriMatcher case SEARCH");
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         SearchContract.MediaEntry.TABLE_NAME,
                         projection,
@@ -91,7 +99,8 @@ public class SearchProvider extends ContentProvider {
                 break;
             }
             // "search/*"
-            case SEARCHWITHMEDIANAME: {
+            case SEARCH_ID: {
+                Log.d(LOG_TAG, "sUriMatcher case SEARCH_ID");
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         SearchContract.MediaEntry.TABLE_NAME,
                         projection,
@@ -114,6 +123,8 @@ public class SearchProvider extends ContentProvider {
     // Ability to insert
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        Log.d(LOG_TAG, "FUNCTION: insert");
+
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         Uri returnUri;
 
@@ -130,6 +141,8 @@ public class SearchProvider extends ContentProvider {
     // Ability to delete
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
+        Log.d(LOG_TAG, "FUNCTION: delete");
+
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int rowsDeleted;
         // this makes delete all rows return the number of rows deleted
@@ -148,6 +161,8 @@ public class SearchProvider extends ContentProvider {
     // Ability to update
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        Log.d(LOG_TAG, "FUNCTION: update");
+
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int rowsUpdated;
 
@@ -163,6 +178,8 @@ public class SearchProvider extends ContentProvider {
     // Ability to bulk insert
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
+        Log.d(LOG_TAG, "FUNCTION: bulkInsert");
+
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
         db.beginTransaction();
@@ -188,6 +205,8 @@ public class SearchProvider extends ContentProvider {
     @Override
     @TargetApi(11)
     public void shutdown() {
+        Log.d(LOG_TAG, "FUNCTION: shutdown");
+
         mOpenHelper.close();
         super.shutdown();
     }

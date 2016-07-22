@@ -14,8 +14,11 @@ public class MainActivity extends AppCompatActivity {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "FUNCTION: onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -32,20 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Log.d(LOG_TAG, "FUNCTION: onCreateOptionsMenu");
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        //MenuItemCompat.setActionProvider(menu.findItem(R.id.action_search), searchPage());
-/*
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-*/
 
         return true;
     }
 
 
     public void searchSubmitted(View view) {
+        Log.d(LOG_TAG, "FUNCTION: searchSubmitted");
         // Get Media Name entered
         EditText mediaNameText = (EditText)findViewById(R.id.search_media_title_id);
         String mediaName = mediaNameText.getText().toString();
@@ -54,10 +52,7 @@ public class MainActivity extends AppCompatActivity {
         Spinner spinnerValue = (Spinner)findViewById(R.id.selected_media_category_id);
         String categoryName = spinnerValue.getSelectedItem().toString();
 
-        Log.d(LOG_TAG, "Searching on Media Name: " + mediaName + " and Category: " + categoryName);
-
-
-
+        Log.d(LOG_TAG, "DEBUG: Searching on Media Name: " + mediaName + " and Category: " + categoryName);
 
         // Pass arguments to fragment
         Bundle bundle = new Bundle();
@@ -70,11 +65,6 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
 
 
-//
-//        QueryResultsFragment fragobj = new QueryResultsFragment();
-//        fragobj.setArguments(bundle);
-//
-//        getSupportFragmentManager().beginTransaction().replace(R.id.query_fragment, fragobj).commit();
 
     }
 }

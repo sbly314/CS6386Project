@@ -29,6 +29,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.utd.sysdproject.cs6386project.MainActivity" />
         </activity>
+        <provider
+            android:authorities="com.utd.sysdproject.cs6386project"
+            android:name=".data.SearchProvider" />
     </application>
 
 </manifest>

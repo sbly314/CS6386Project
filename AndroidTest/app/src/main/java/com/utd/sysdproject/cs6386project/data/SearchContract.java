@@ -4,11 +4,15 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.util.Log;
+
 
 /**
  * Defines contract for searching based on mediaName and category
  */
 public class SearchContract {
+    private static final String LOG_TAG = SearchContract.class.getSimpleName();
+
     // The "Content authority" is a name for the entire content provider, similar to the
     // relationship between a domain name and its website.  A convenient string to use for the
     // content authority is the package name for the app, which is guaranteed to be unique on the
@@ -28,7 +32,11 @@ public class SearchContract {
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH;
 
+
+        // Table Name
         public static final String TABLE_NAME = "media";
 
         // No need to implement unique key for each row; BaseColumns takes care of this
@@ -45,19 +53,25 @@ public class SearchContract {
         // Port
         public static final String COLUMN_PORT = "port";
 
+        public static Uri buildSearchNoParams() {
+            Log.d(LOG_TAG, "FUNCTION: buildSearchNoParams");
+            return CONTENT_URI;
+        }
+
         public static Uri buildSearchUri(long id) {
+            Log.d(LOG_TAG, "FUNCTION: buildSearchUri");
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
         public static Uri buildSearchUriWithParameters(
-                String mediaName, String category, String IP, String port) {
-            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_MEDIANAME, mediaName)
-                    .appendQueryParameter(COLUMN_CATEGORY, category)
-                    .appendQueryParameter(COLUMN_IP, IP)
-                    .appendQueryParameter(COLUMN_PORT, port).build();
+                String mediaName) {
+            Log.d(LOG_TAG, "FUNCTION: buildSearchUriWithParameters");
+            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_MEDIANAME, mediaName).build();
         }
 
         public static String getMediaNameFromUri(Uri uri) {
+            Log.d(LOG_TAG, "FUNCTION: getMediaNameFromUri");
+
             String mediaName = uri.getQueryParameter(COLUMN_MEDIANAME);
             if (mediaName != null && mediaName.length() > 0) {
                 return mediaName;
@@ -67,6 +81,8 @@ public class SearchContract {
         }
 
         public static String getCategoryFromUri(Uri uri) {
+            Log.d(LOG_TAG, "FUNCTION: getCategoryFromUri");
+
             String category = uri.getQueryParameter(COLUMN_CATEGORY);
             if (category != null && category.length() > 0) {
                 return category;
@@ -76,6 +92,8 @@ public class SearchContract {
         }
 
         public static String getIPFromUri(Uri uri) {
+            Log.d(LOG_TAG, "FUNCTION: getIPFromUri");
+
             String ip = uri.getQueryParameter(COLUMN_IP);
             if (ip != null && ip.length() > 0) {
                 return ip;
@@ -85,6 +103,8 @@ public class SearchContract {
         }
 
         public static String getPortFromUri(Uri uri) {
+            Log.d(LOG_TAG, "FUNCTION: getPortFromUri");
+
             String port = uri.getQueryParameter(COLUMN_PORT);
             if (port != null && port.length() > 0) {
                 return port;
