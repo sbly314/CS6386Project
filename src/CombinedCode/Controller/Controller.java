@@ -169,7 +169,7 @@ class clientThread extends Thread {
 	  int found=0;
 	  if(message.equals("search")){ //search moviename-Drama
 	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
-	  String temp2[]=temp[1].split("-");
+	  String temp2[]=temp[1].split("/");
 	  if(temp2[1].equals("ALL")){
 	  	  System.out.println("\nSearching for "+temp2[1]+"files in media list\n");
 		  dbUser.dbParser(dbUser.queryAll()); // Query All
