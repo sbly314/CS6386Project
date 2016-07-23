@@ -131,21 +131,32 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
         // or magically appeared to take advantage of room, but data or place in the app was never
         // actually *lost*.
         if (savedInstanceState != null) {
+            Log.d(LOG_TAG, "DEBUG: savedInstanceState != null");
             // The listview probably hasn't even been populated yet.  Actually perform the
             // swapout in onLoadFinished.
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
             mMediaName = savedInstanceState.getString(SEARCH_MEDIANAME);
             mCategory = savedInstanceState.getString(SEARCH_CATEGORY);
         } else {
-            Bundle extras = getActivity().getIntent().getExtras();
 
-            mMediaName = extras.getString("mediaName_string");
-            mCategory = extras.getString("category_string");
+            Log.d(LOG_TAG, "DEBUG: savedInstanceState == null and now trying to read from Intent");
+
+            // check if new search (as opposed to coming back from Video playing)
+            if ( (mMediaName == null) || (mCategory == null) ) {
+                Bundle extras = getActivity().getIntent().getExtras();
+
+                try {
+                    mMediaName = extras.getString("mediaName_string");
+                    mCategory = extras.getString("category_string");
+
+                    // Only need to query the database if this is the first time searching with this criteria
+                    updateMedia(mMediaName, mCategory);
+                } catch (NullPointerException e ) {
+                    Log.d(LOG_TAG, "DEBUG: NullPointerException hit");
+                }
+            }
 
             Log.d(LOG_TAG, "Received from MainActivity... Media Name: " + mMediaName + " and Category: " + mCategory);
-
-            // Only need to query the database if this is the first time searching with this criteria
-            updateMedia(mMediaName, mCategory);
         }
 
         // The QueryAdapter will take data from a source and
@@ -172,6 +183,24 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
                     // add to backStack when switching to fragment
                     String text = cursor.getString(COL_IP) + ":" + cursor.getString(COL_PORT) + "/" + cursor.getString(COL_MEDIANAME);
                     Toast.makeText(getContext(),text,Toast.LENGTH_LONG).show();
+
+                    // store values
+                    Bundle outState = new Bundle();
+
+                    onSaveInstanceState(outState);
+
+
+
+                    // Pass arguments to fragment
+                    Bundle bundle = new Bundle();
+                    bundle.putString("ip_string", cursor.getString(COL_IP));
+                    bundle.putString("port_string", cursor.getString(COL_PORT));
+                    bundle.putString("medianame_string", cursor.getString(COL_MEDIANAME));
+
+                    // Intent(FirstScreen.this, SecondScreen.class)
+                    Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
                 }
                 mPosition = position;
             }

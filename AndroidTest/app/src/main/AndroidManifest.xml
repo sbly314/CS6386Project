@@ -29,9 +29,26 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.utd.sysdproject.cs6386project.MainActivity" />
         </activity>
+
         <provider
-            android:authorities="com.utd.sysdproject.cs6386project"
-            android:name=".data.SearchProvider" />
+            android:name=".data.SearchProvider"
+            android:authorities="com.utd.sysdproject.cs6386project" />
+
+        <activity
+            android:name=".MediaPlayerActivity"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_media_player"
+            android:parentActivityName=".QueryResults"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.utd.sysdproject.cs6386project.QueryResults" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
