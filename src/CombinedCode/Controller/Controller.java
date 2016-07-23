@@ -176,7 +176,7 @@ class clientThread extends Thread {
 	  } else {
 		 if(temp2[0].equals("NONE")){
 		 	System.out.println("\nSearching for all files in category "+temp2[1]+"\n");
-			dbUser.dbParser(dbUser.queryCriteria(temp2[1], null)); // Category-only
+			dbUser.dbParser(dbUser.queryCriteria(null, temp2[1])); // Category-only
 		 }
 		 else{
 		 	System.out.println("\nSearching for "+temp2[0]+" in category "+temp2[1]+"\n");
