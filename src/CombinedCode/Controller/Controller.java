@@ -10,6 +10,7 @@ import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /*
@@ -861,7 +862,7 @@ class DBControllerUser {
 	 * Need to handle case where ResultSet may be empty (No matches found)
 	 * Need to also extract the first value from the comma-separated results
 	 */
-	public String dbParser(Vector<Vector<String>> rs) {
+	public String dbParser(Vector<Vector<String>> rs) throws JSONException {
 		String errMessage = "ERR";
 		
 		if ( rs == null) {
@@ -871,53 +872,59 @@ class DBControllerUser {
 			System.out.println("No movies matched your criteria");
 			return errMessage;
 		} else {
-			Enumeration<Vector<String>> eRS = rs.elements();
-			
-			// JSON Object and Array
-			JSONObject jsonObject = new JSONObject();
-			JSONArray jsonMediaList = new JSONArray();
-			
-			while(eRS.hasMoreElements()) {
-				Enumeration<String> eRow = eRS.nextElement().elements();
+			try {
+				Enumeration<Vector<String>> eRS = rs.elements();
 				
-				String movieName = eRow.nextElement();
-				String serverIP = eRow.nextElement();
-				String serverPort = eRow.nextElement();
-				String category = eRow.nextElement();
+				// JSON Object and Array
+				JSONObject jsonObject = new JSONObject();
+				JSONArray jsonMediaList = new JSONArray();
 				
-				String[] serverIPsplit;
-				String[] serverPortsplit;
-				
-				if (serverIP.contains(",")) {
-					serverIPsplit = serverIP.split(",");
-					serverIP = serverIPsplit[0];
+				while(eRS.hasMoreElements()) {
+					Enumeration<String> eRow = eRS.nextElement().elements();
+					
+					String movieName = eRow.nextElement();
+					String serverIP = eRow.nextElement();
+					String serverPort = eRow.nextElement();
+					String category = eRow.nextElement();
+					
+					String[] serverIPsplit;
+					String[] serverPortsplit;
+					
+					if (serverIP.contains(",")) {
+						serverIPsplit = serverIP.split(",");
+						serverIP = serverIPsplit[0];
+					}
+					
+					if (serverPort.contains(",")) {
+						serverPortsplit = serverPort.split(",");
+						serverPort = serverPortsplit[0];
+					}
+					
+					
+					
+					// Convert to JSON
+					JSONObject resultJSONObj = new JSONObject();
+					
+					resultJSONObj.put("name", movieName);
+					resultJSONObj.put("category", category);
+					resultJSONObj.put("ip", movieName);
+					resultJSONObj.put("port", serverPort);
+					
+					jsonMediaList.put(resultJSONObj);
+					
+	
+					System.out.println("movieName = " + movieName);
+					System.out.println("serverIP = " + serverIP);
+					System.out.println("serverPort = " + serverPort);
+					System.out.println("category = " + category);
+					System.out.println("---------------------");
 				}
-				
-				if (serverPort.contains(",")) {
-					serverPortsplit = serverPort.split(",");
-					serverPort = serverPortsplit[0];
-				}
-				
-				
-				
-				// Convert to JSON
-				JSONObject resultJSONObj = new JSONObject();
-				
-				resultJSONObj.put("name", movieName);
-				resultJSONObj.put("category", category);
-				resultJSONObj.put("ip", movieName);
-				resultJSONObj.put("port", serverPort);
-				
-				jsonMediaList.put(resultJSONObj);
-				
-
-				System.out.println("movieName = " + movieName);
-				System.out.println("serverIP = " + serverIP);
-				System.out.println("serverPort = " + serverPort);
-				System.out.println("category = " + category);
-				System.out.println("---------------------");
-			}
-			jsonObject.put("medialist", jsonMediaList);
+				jsonObject.put("medialist", jsonMediaList);
+			}  catch (JSONException e) {
+		            Log.e(LOG_TAG, e.getMessage(), e);
+		            e.printStackTrace();
+		            return errMessage;
+		        }
 			
 			return jsonObject.toString();
 		}
