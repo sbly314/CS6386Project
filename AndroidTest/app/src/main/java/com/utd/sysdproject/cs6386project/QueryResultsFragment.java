@@ -152,6 +152,7 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
         // use it to populate the ListView it's attached to.
         mQueryAdapter = new QueryAdapter(getActivity(), null, 0);
 
+
         View rootView = inflater.inflate(R.layout.fragment_query_results, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.

@@ -39,6 +39,7 @@ public class SearchDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_MEDIA_TABLE);
     }
 
+    /* Clear the DB from previous application runs */
     @Override
     public void onOpen(SQLiteDatabase sqLiteDatabase) {
         Log.d(LOG_TAG, "FUNCTION: onOpen");
@@ -49,6 +50,8 @@ public class SearchDbHelper extends SQLiteOpenHelper {
 
         onCreate(sqLiteDatabase);
     }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {

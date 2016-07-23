@@ -101,6 +101,9 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
 
         Log.d(LOG_TAG, "FUNCTION: getMediaDataFromJson");
 
+        // Delete data from databse if there is anything currently in there
+        mContext.getContentResolver().delete(SearchContract.MediaEntry.CONTENT_URI, null, null);
+
         // These are the names of the JSON objects that need to be extracted.
         final String CONTROLLER_LIST = "medialist";
 
