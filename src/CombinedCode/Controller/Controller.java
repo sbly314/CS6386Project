@@ -173,15 +173,16 @@ class clientThread extends Thread {
 	  if(temp2[0].equals("ALL")){
 	  	  System.out.println("\nSearching for "+temp2[0]+"files in media list\n");
 		  dbUser.dbParser(dbUser.queryAll()); // Query All
+	  } else {
+		 if(temp2[0].equals("NONE")){
+		 	System.out.println("\nSearching for all files in category "+temp2[1]+"\n");
+			dbUser.dbParser(dbUser.queryCriteria(temp2[1], null)); // Category-only
+		 }
+		 else{
+		 	System.out.println("\nSearching for "+temp2[0]+" in category "+temp2[1]+"\n");
+		        dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
+		 }
 	  }
-	 if(temp2[0].equals("NONE")){
-	 	System.out.println("\nSearching for all files in category "+temp2[1]+"\n");
-		dbUser.dbParser(dbUser.queryCriteria(temp2[1], null)); // Category-only
-	 }
-	 else{
-	 	System.out.println("\nSearching for "+temp2[0]+" in category "+temp2[1]+"\n");
-	        dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
-	 }
 	  
 	 /* for(int i=0;i<Controller.size;i++){
 		if(temp[1].equals(Controller.mediaList[i])){
