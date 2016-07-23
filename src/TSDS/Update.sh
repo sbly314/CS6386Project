@@ -35,21 +35,46 @@ echo "---------------------------------------------------------------"
 fi
 
 if [ "$command" = 'SUBSCRIBE' ];then
-        ls Add/Drama -1 > Drama.txt
-        ls Add/Fiction -1 > Fiction.txt
-        ls Add/Romance -1 > Romance.txt
-        ls Add/Fiction -1 > Horror.txt
-
-cat $Drama.txt | sed -e "s/#.*//" | sed -e "/^\s*$/d" | (
+	 echo " "
+       # ls Add/Drama -1 > Drama.txt
+       # ls Add/Fiction -1 > Fiction.txt
+       # ls Add/Romance -1 > Romance.txt
+       # ls Add/Fiction -1 > Horror.txt
+file=Drama.txt
+#ls Downloads/Drama | wc -l
+cat $file | sed -e "s/#.*//" | sed -e "/^\s*$/d" | (
     while read line
     do
-        echo "$line"
-        java Update 
-        if [[ $node = $(( total-1)) ]] ; then
-	   break
-        fi
-        node=$(( node + 1 ))
+     	java Update $command $line-Drama 
+	echo "$line added successfully"  
     done
 )
-
+echo "---------------------------------------------------------------"
 fi
+
+
+if [ "$command" = 'REMOVE' ];then
+         echo " "
+	 echo "Enter Media Name:"
+	 read mediaName
+	 echo " "
+	 echo "Enter Category:"
+         read category
+         java Update $command $mediaName-$category
+	 rm Downloads/$category/$mediaName
+         echo "$mediaName removed  successfully"
+echo "---------------------------------------------------------------"
+fi
+
+if [ "$command" = 'ADD' ];then
+         echo " "
+         echo "Enter Media Name:"
+         read mediaName
+         echo " "
+         echo "Enter Category:"
+         read category
+         java Update $command $mediaName-$category
+         echo "$mediaName added successfully to Controller database"
+echo "---------------------------------------------------------------"
+fi
+
