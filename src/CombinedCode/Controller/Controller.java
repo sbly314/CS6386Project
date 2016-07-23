@@ -9,6 +9,8 @@ import java.io.*;
 import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /*
  * A chat server that delivers public and private messages.
@@ -852,18 +854,28 @@ class DBControllerUser {
 	 * @author Stephen
 	 * 
 	 * @param ResultSet rs - contains results of query; need to validate not null
+	 * @return String - formatted in JSON output
+	 * 
 	 * 
 	 * Need to handle case where ResultSet may be null (connection failed)
 	 * Need to handle case where ResultSet may be empty (No matches found)
 	 * Need to also extract the first value from the comma-separated results
 	 */
-	public void dbParser(Vector<Vector<String>> rs) {
+	public String dbParser(Vector<Vector<String>> rs) {
+		String errMessage = "ERR";
+		
 		if ( rs == null) {
 			System.out.println("Error connecting to database.  Please try again later.");
+			return errMessage;
 		} else if (rs.isEmpty()) {
 			System.out.println("No movies matched your criteria");
+			return errMessage;
 		} else {
 			Enumeration<Vector<String>> eRS = rs.elements();
+			
+			// JSON Object and Array
+			JSONObject jsonObject = new JSONObject();
+			JSONArray jsonMediaList = new JSONArray();
 			
 			while(eRS.hasMoreElements()) {
 				Enumeration<String> eRow = eRS.nextElement().elements();
@@ -888,7 +900,15 @@ class DBControllerUser {
 				
 				
 				
-				// IMPLEMENT JSON CODE HERE
+				// Convert to JSON
+				JSONObject resultJSONObj = new JSONObject();
+				
+				resultJSONObj.put("name", movieName);
+				resultJSONObj.put("category", category);
+				resultJSONObj.put("ip", movieName);
+				resultJSONObj.put("port", serverPort);
+				
+				jsonMediaList.add(resultJSONObj);
 				
 
 				System.out.println("movieName = " + movieName);
@@ -897,6 +917,9 @@ class DBControllerUser {
 				System.out.println("category = " + category);
 				System.out.println("---------------------");
 			}
+			jsonObject.put("medialist", jsonMediaList);
+			
+			return jsonObject.toString();
 		}
 	}
 }
