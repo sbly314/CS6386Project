@@ -921,7 +921,7 @@ class DBControllerUser {
 				}
 				jsonObject.put("medialist", jsonMediaList);
 			}  catch (JSONException e) {
-		            Log.e(LOG_TAG, e.getMessage(), e);
+		            System.out.println(e.getMessage());
 		            e.printStackTrace();
 		            return errMessage;
 		        }
