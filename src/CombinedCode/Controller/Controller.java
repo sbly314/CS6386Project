@@ -908,7 +908,7 @@ class DBControllerUser {
 				resultJSONObj.put("ip", movieName);
 				resultJSONObj.put("port", serverPort);
 				
-				jsonMediaList.add(resultJSONObj);
+				jsonMediaList.put(resultJSONObj);
 				
 
 				System.out.println("movieName = " + movieName);
