@@ -790,7 +790,7 @@ class DBControllerUser {
 	 * 
 	 * This method queries for specific criteria
 	 */
-	public Vector<Vector<String>> queryCriteria(String categoryCrit, String movieNameCrit) {
+	public Vector<Vector<String>> queryCriteria(String movieNameCrit, String categoryCrit) {
 		Vector<Vector<String>> results = null;
 		
 		System.out.println("categoryCrit is " + categoryCrit);
