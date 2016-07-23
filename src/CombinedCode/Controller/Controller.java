@@ -926,7 +926,11 @@ class DBControllerUser {
 		            return errMessage;
 		        }
 			
-			return jsonObject.toString();
+			String jsonStr = jsonObject.toString();
+			
+			System.out.println("DEBUG: jsonStr is " + jsonStr);
+			
+			return jsonStr;
 		}
 	}
 }
