@@ -168,19 +168,20 @@ class clientThread extends Thread {
 	  } 
 	  int found=0;
 	  if(message.equals("search")){ //search moviename-Drama
-	  System.out.println("\nSearching "+temp[1]+" in media list\n");
+	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("-");
 	  if(temp2[1].equals("ALL")){
+	  	  System.out.println("\nSearching for "+temp2[1]+"files in media list\n");
 		  dbUser.dbParser(dbUser.queryAll()); // Query All
 	  }
-	  else {
-		  if(temp2[0].equals("null")){
-				dbUser.dbParser(dbUser.queryCriteria(temp2[1], null)); // Category-only
-		  }
-		  else{
-			    dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
-		  }
-	  }
+	 if(temp2[0].equals("NONE")){
+	 	System.out.println("\nSearching for all files in category "+temp[1]+"\n");
+		dbUser.dbParser(dbUser.queryCriteria(temp2[1], null)); // Category-only
+	 }
+	 else{
+	 	System.out.println("\nSearching for "+temp2[0]+" in category "+temp[1]+"\n");
+	        dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
+	 }
 	  
 	 /* for(int i=0;i<Controller.size;i++){
 		if(temp[1].equals(Controller.mediaList[i])){
@@ -194,7 +195,7 @@ class clientThread extends Thread {
 		System.out.println("No match Found. Sending Error code ERR");
 		os.println("FIN ERR");
 		}*/
-		os.println("FIN "+Controller.mediaList[i]);
+		os.println("FIN xyz");
 	  break;
 	  } 
 	  
