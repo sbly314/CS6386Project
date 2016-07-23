@@ -872,12 +872,12 @@ class DBControllerUser {
 			System.out.println("No movies matched your criteria");
 			return errMessage;
 		} else {
+			// JSON Object and Array
+			JSONObject jsonObject = new JSONObject();
+			JSONArray jsonMediaList = new JSONArray();
+			
 			try {
 				Enumeration<Vector<String>> eRS = rs.elements();
-				
-				// JSON Object and Array
-				JSONObject jsonObject = new JSONObject();
-				JSONArray jsonMediaList = new JSONArray();
 				
 				while(eRS.hasMoreElements()) {
 					Enumeration<String> eRow = eRS.nextElement().elements();
