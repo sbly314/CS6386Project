@@ -793,6 +793,10 @@ class DBControllerUser {
 	public Vector<Vector<String>> queryCriteria(String categoryCrit, String movieNameCrit) {
 		Vector<Vector<String>> results = null;
 		
+		System.out.println("categoryCrit is " + categoryCrit);
+		System.out.println("movieNameCrit is " + movieNameCrit);
+		
+		
 		// base query
 		String queryCriteria = "SELECT TV.TV_Movie_name, GROUP_CONCAT(INET_NTOA(MS.IP)), GROUP_CONCAT(MS.Port), Cat.Category_name "
 				+ "FROM MEDIA_SERVERS MS, TV_MOVIES TV, CATEGORIES Cat, "
