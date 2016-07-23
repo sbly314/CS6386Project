@@ -170,8 +170,8 @@ class clientThread extends Thread {
 	  if(message.equals("search")){ //search moviename-Drama
 	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("/");
-	  if(temp2[1].equals("ALL")){
-	  	  System.out.println("\nSearching for "+temp2[1]+"files in media list\n");
+	  if(temp2[0].equals("ALL")){
+	  	  System.out.println("\nSearching for "+temp2[0]+"files in media list\n");
 		  dbUser.dbParser(dbUser.queryAll()); // Query All
 	  }
 	 if(temp2[0].equals("NONE")){
