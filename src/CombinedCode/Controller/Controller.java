@@ -182,7 +182,7 @@ class clientThread extends Thread {
 		  }
 	  }
 	  
-	  for(int i=0;i<Controller.size;i++){
+	 /* for(int i=0;i<Controller.size;i++){
 		if(temp[1].equals(Controller.mediaList[i])){
 		System.out.println("Match found. Sending Media");
 		os.println("FIN "+Controller.mediaList[i]);
@@ -193,7 +193,8 @@ class clientThread extends Thread {
 	  if(found==0){
 		System.out.println("No match Found. Sending Error code ERR");
 		os.println("FIN ERR");
-		}
+		}*/
+		os.println("FIN "+Controller.mediaList[i]);
 	  break;
 	  } 
 	  
