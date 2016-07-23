@@ -862,7 +862,7 @@ class DBControllerUser {
 	 * Need to handle case where ResultSet may be empty (No matches found)
 	 * Need to also extract the first value from the comma-separated results
 	 */
-	public String dbParser(Vector<Vector<String>> rs) throws JSONException {
+	public String dbParser(Vector<Vector<String>> rs) {
 		String errMessage = "ERR";
 		
 		if ( rs == null) {
