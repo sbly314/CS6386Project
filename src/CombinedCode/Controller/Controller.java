@@ -861,7 +861,7 @@ class DBControllerUser {
 	 * Need to also extract the first value from the comma-separated results
 	 */
 	public String dbParser(Vector<Vector<String>> rs) {
-		String errMessage = "ERR";
+		String errMessage = "1";
 		
 		if ( rs == null) {
 			System.out.println("Error connecting to database.  Please try again later.");
@@ -924,7 +924,7 @@ class DBControllerUser {
 		            return errMessage;
 		        }
 			
-			String jsonStr = jsonObject.toString();
+			String jsonStr = "0$" + jsonObject.toString();
 			
 			System.out.println("DEBUG: jsonStr is " + jsonStr);
 			
