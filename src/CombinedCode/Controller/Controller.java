@@ -2,7 +2,7 @@ import java.io.DataInputStream;
 import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.ServerSocket;
+import java.net.ServerSocket
 import java.net.*;
 import java.util.concurrent.Semaphore;
 import java.io.*;
@@ -116,7 +116,7 @@ class clientThread extends Thread {
 	  {
 	  String line="";
       line = is.readLine();
-      String temp[]=line.split("$");
+      String temp[]=line.split(",");
       String message=temp[0];
 	  
 	  if(message.equals("SYN")){
@@ -188,14 +188,14 @@ class clientThread extends Thread {
 		 }
 	  }
 	  
-	 String temp3[]=response.split("$");
+	 String temp3[]=response.split(",");
 	  if(temp3[0].equals("1")){
 		System.out.println("No match Found. Sending Error code ERR");
-		os.println("FIN$ERR");
+		os.println("FIN,ERR");
 		}
 	  else{
 		  System.out.println("Match Found. Sending response in json Format");
-		  os.println("FIN$"+temp3[1]);
+		  os.println("FIN,"+temp3[1]);
 	  }
 
 	  break;
@@ -212,7 +212,7 @@ class clientThread extends Thread {
 	  String temp2[]=temp[1].split("-");
 	  dbController.insertQuery(IP, temp2[0], temp2[1]);
 	  System.out.println("\nSending FIN");
-	  os.println("FIN$"+temp[1]);
+	  os.println("FIN,"+temp[1]);
 	  break;
 	  }
 	  int remove=0;
@@ -231,14 +231,14 @@ class clientThread extends Thread {
 		for(int i=0;i<Controller.size;i++){
 			System.out.println(Controller.mediaList[i]);
 		}
-		os.println("FIN$"+temp[1]);
+		os.println("FIN,"+temp[1]);
 		remove=1;
 		break;
 		}
 	  }
 	  if(remove==0){
 		System.out.println("Media not found. Enter a valid Media name.");
-		os.println("FIN$ERR");
+		os.println("FIN,ERR");
 		}
 	  System.out.println("\nSending FIN");
 	  os.println("FIN");
@@ -924,7 +924,7 @@ class DBControllerUser {
 		            return errMessage;
 		        }
 			
-			String jsonStr = "0$" + jsonObject.toString();
+			String jsonStr = "0," + jsonObject.toString();
 			
 			System.out.println("DEBUG: jsonStr is " + jsonStr);
 			
