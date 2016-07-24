@@ -903,14 +903,12 @@ class DBControllerUser {
 					
 					
 					// Convert to JSON (use LinkedHashMap to get values in correct order)
-					Map obj = new LinkedHashMap(); 
+					JSONObject resultJSONObj = new JSONObject();
 					
-					obj.put("name", movieName);
-					obj.put("category", category);
-					obj.put("ip", serverIP);
-					obj.put("port", serverPort);
-					
-					JSONObject resultJSONObj = (JSONObject) obj;
+					resultJSONObj.put("name", movieName);
+					resultJSONObj.put("category", category);
+					resultJSONObj.put("ip", serverIP);
+					resultJSONObj.put("port", serverPort);
 					
 					jsonMediaList.put(resultJSONObj);
 					
