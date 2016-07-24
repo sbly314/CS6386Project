@@ -53,17 +53,17 @@ public class MediaServer {
 	String media="media";
 	System.out.println("\nMedia List:\n");
 	for(int i=0;i<3;i++){
-		media=media.concat(" ");
+		media=media.concat("$");
 		media=media.concat(mediaList[i]);
 		System.out.println(mediaList[i]);
 	}
 	
 	System.out.println("\nSending SYN");
-	os.println("SYN 10.111.152.13 2223");
+	os.println("SYN$10.111.152.13$2223");
     while(true){
 	String line="";
 	line=is.readLine();
-	String temp[]=line.split(" ");  
+	String temp[]=line.split("$");  
 	if(temp[0].equals("ACK")){
 		System.out.println("\nReceived "+temp[0]);
 		System.out.println("\nSending Media List");
