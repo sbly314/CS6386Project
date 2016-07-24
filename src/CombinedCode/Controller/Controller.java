@@ -116,7 +116,7 @@ class clientThread extends Thread {
 	  {
 	  String line="";
       line = is.readLine();
-      String temp[]=line.split(" ");
+      String temp[]=line.split(":");
       String message=temp[0];
 	  
 	  if(message.equals("SYN")){
@@ -173,33 +173,31 @@ class clientThread extends Thread {
 	  if(message.equals("search")){ //search moviename-Drama
 	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("/");
+	  String response="";
 	  if(temp2[0].equals("ALL")){
 	  	  System.out.println("\nSearching for "+temp2[0]+"files in media list\n");
-		  dbUser.dbParser(dbUser.queryAll()); // Query All
+		  response=dbUser.dbParser(dbUser.queryAll()); // Query All
 	  } else {
 		 if(temp2[0].equals("NONE")){
 		 	System.out.println("\nSearching for all files in category "+temp2[1]+"\n");
-			dbUser.dbParser(dbUser.queryCriteria(null, temp2[1])); // Category-only
+			response=dbUser.dbParser(dbUser.queryCriteria(null, temp2[1])); // Category-only
 		 }
 		 else{
 		 	System.out.println("\nSearching for "+temp2[0]+" in category "+temp2[1]+"\n");
-		        dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
+		    response=dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
 		 }
 	  }
 	  
-	 /* for(int i=0;i<Controller.size;i++){
-		if(temp[1].equals(Controller.mediaList[i])){
-		System.out.println("Match found. Sending Media");
-		os.println("FIN "+Controller.mediaList[i]);
-		found=1;
-		break;
-		}
-	  }
-	  if(found==0){
+	 String temp3[]=response.split(":");
+	  if(temp3[0].equals("1")){
 		System.out.println("No match Found. Sending Error code ERR");
-		os.println("FIN ERR");
-		}*/
-		os.println("FIN xyz");
+		os.println("FIN:ERR");
+		}
+	  else{
+		  System.out.println("Match Found. Sending response in json Format");
+		  os.println("FIN:"+temp3[1]);
+	  }
+
 	  break;
 	  } 
 	  
@@ -214,7 +212,7 @@ class clientThread extends Thread {
 	  String temp2[]=temp[1].split("-");
 	  dbController.insertQuery(IP, temp2[0], temp2[1]);
 	  System.out.println("\nSending FIN");
-	  os.println("FIN "+temp[1]);
+	  os.println("FIN:"+temp[1]);
 	  break;
 	  }
 	  int remove=0;
@@ -233,14 +231,14 @@ class clientThread extends Thread {
 		for(int i=0;i<Controller.size;i++){
 			System.out.println(Controller.mediaList[i]);
 		}
-		os.println("FIN "+temp[1]);
+		os.println("FIN:"+temp[1]);
 		remove=1;
 		break;
 		}
 	  }
 	  if(remove==0){
 		System.out.println("Media not found. Enter a valid Media name.");
-		os.println("FIN ERR");
+		os.println("FIN:ERR");
 		}
 	  System.out.println("\nSending FIN");
 	  os.println("FIN");
@@ -976,5 +974,4 @@ class DBConnection {
         return DriverManager.getConnection(url, username, password);
     }
 }
-
 
