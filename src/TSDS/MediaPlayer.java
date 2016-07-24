@@ -68,7 +68,7 @@ public class MediaPlayer {
 	String line="";
 	line=is.readLine();
 
-	String temp[]=line.split("$");  
+	String temp[]=line.split(",");  
 	if(temp[0].equals("ACK")){
 		System.out.println("\nReceived "+temp[0]);
 		System.out.println("\nEnter String to Search:");
