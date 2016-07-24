@@ -171,7 +171,7 @@ class clientThread extends Thread {
 	  } 
 	  int found=0;
 	  if(message.equals("search")){ //search moviename-Drama
-	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
+	  System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("/");
 	  String response="";
 	  if(temp2[0].equals("ALL")){
