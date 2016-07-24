@@ -74,7 +74,7 @@ public class MediaPlayer {
 		System.out.println("\nEnter String to Search:");
 		String media="";
 		media = input.nextLine();
-		search=search.concat("/");
+		search=search.concat(",");
 		search=search.concat(media);
 		os.println(search);
 	}
