@@ -860,75 +860,81 @@ class DBControllerUser {
 	 * Need to handle case where ResultSet may be empty (No matches found)
 	 * Need to also extract the first value from the comma-separated results
 	 */
-	public String dbParser(Vector<Vector<String>> rs) {
+	public Vector<String> dbParser(Vector<Vector<String>> rs) {
+		Vector<String> returnVector = new Vector<String>();
+		
 		String errMessage = "1";
 		
 		if ( rs == null) {
 			System.out.println("Error connecting to database.  Please try again later.");
-			return errMessage;
+			returnVector.add(errMessage);
+			return returnVector;
 		} else if (rs.isEmpty()) {
 			System.out.println("No movies matched your criteria");
-			return errMessage;
+			returnVector.add(errMessage);
+			return returnVector;
 		} else {
 			// JSON Object and Array
 			JSONObject jsonObject = new JSONObject();
 			JSONArray jsonMediaList = new JSONArray();
 			
-			try {
-				Enumeration<Vector<String>> eRS = rs.elements();
+			// used to add the header
+			int firstRunIP = 0;
+			
+			Enumeration<Vector<String>> eRS = rs.elements();
+			
+			while(eRS.hasMoreElements()) {
+				Enumeration<String> eRow = eRS.nextElement().elements();
 				
-				while(eRS.hasMoreElements()) {
-					Enumeration<String> eRow = eRS.nextElement().elements();
-					
-					String movieName = eRow.nextElement();
-					String serverIP = eRow.nextElement();
-					String serverPort = eRow.nextElement();
-					String category = eRow.nextElement();
-					
-					String[] serverIPsplit;
-					String[] serverPortsplit;
-					
-					if (serverIP.contains(",")) {
-						serverIPsplit = serverIP.split(",");
-						serverIP = serverIPsplit[0];
-					}
-					
-					if (serverPort.contains(",")) {
-						serverPortsplit = serverPort.split(",");
-						serverPort = serverPortsplit[0];
-					}
-					
-					
-					
-					// Convert to JSON (use LinkedHashMap to get values in correct order)
-					JSONObject resultJSONObj = new JSONObject();
-					
-					resultJSONObj.put("name", movieName);
-					resultJSONObj.put("category", category);
-					resultJSONObj.put("ip", serverIP);
-					resultJSONObj.put("port", serverPort);
-					
-					jsonMediaList.put(resultJSONObj);
-					
-	
-					System.out.println("movieName = " + movieName);
-					System.out.println("serverIP = " + serverIP);
-					System.out.println("serverPort = " + serverPort);
-					System.out.println("category = " + category);
-					System.out.println("---------------------");
+				String movieName = eRow.nextElement();
+				String serverIP = eRow.nextElement();
+				String serverPort = eRow.nextElement();
+				String category = eRow.nextElement();
+				
+				String[] serverIPsplit;
+				String[] serverPortsplit;
+				
+				if (serverIP.contains(",")) {
+					serverIPsplit = serverIP.split(",");
+					serverIP = serverIPsplit[0];
 				}
-				jsonObject.put("medialist", jsonMediaList);
-			}  catch (JSONException e) {
-		            System.out.println(e.getMessage());
-		            e.printStackTrace();
-		            return errMessage;
-		        }
+				
+				if (serverPort.contains(",")) {
+					serverPortsplit = serverPort.split(",");
+					serverPort = serverPortsplit[0];
+				}
+				
+				
+				if(firstRunIP == 0) {
+					// Put a 0 at the front for parsing in the calling function
+					String header = "0,{\"ip\":\"" + serverIP + "\",\"port\":\"" + serverPort + "\",\"medialist\":[";
+					
+					returnVector.add(header);
+					
+					++firstRunIP;
+				}
+				
+				
+				String entry = "{\"name\":\"" + movieName + "\",\"category\":\"" + category + "\"}";
+				
+				if(eRS.hasMoreElements()) {
+					entry.concat(",");
+				}
+				
+				returnVector.add(entry);
+				
+				
+				System.out.println("movieName = " + movieName);
+				System.out.println("serverIP = " + serverIP);
+				System.out.println("serverPort = " + serverPort);
+				System.out.println("category = " + category);
+				System.out.println("---------------------");
+			}
 			
-			String jsonStr = "0," + jsonObject.toString();
+			System.out.println("DEBUG: returnVector is " + returnVector.toString());
+				
 			
-			System.out.println("DEBUG: jsonStr is " + jsonStr);
-			
-			return jsonStr;
+			return returnVector;
 		}
 	}
 }
