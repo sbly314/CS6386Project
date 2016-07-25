@@ -106,6 +106,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
 
         Log.d(LOG_TAG, "DEBUG: Received from QueryResultsFragment... " + IP + ":" + Port + "/" + MediaName);
 
+
         // set the media controller buttons
         if (mediaControls == null) {
             mediaControls = new MediaController(MediaPlayerActivity.this);
@@ -130,9 +131,12 @@ public class MediaPlayerActivity extends AppCompatActivity {
             vidView.setMediaController(mediaControls);
 
             // for testing
-            String URL = "wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+//            String CONTENTTYPE = "rtsp";
+//            String URL = "wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+            String CONTENTTYPE = "rtsp";
+            String URL = "129.110.92.15:8554/video480p.mkv";
 
-            Uri MEDIA_STREAM = Uri.parse("rtsp://" + URL);
+            Uri MEDIA_STREAM = Uri.parse(CONTENTTYPE + "://" + URL);
 
             // set uri of video to be played
             vidView.setVideoURI(MEDIA_STREAM);

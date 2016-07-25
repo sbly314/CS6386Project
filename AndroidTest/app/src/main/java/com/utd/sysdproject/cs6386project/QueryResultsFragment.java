@@ -164,7 +164,7 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
         mQueryAdapter = new QueryAdapter(getActivity(), null, 0);
 
 
-        View rootView = inflater.inflate(R.layout.fragment_query_results, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_query_results, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listview_media);
@@ -181,26 +181,30 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
                 if (cursor != null) {
                     // load video
                     // add to backStack when switching to fragment
-                    String text = cursor.getString(COL_IP) + ":" + cursor.getString(COL_PORT) + "/" + cursor.getString(COL_MEDIANAME);
-                    Toast.makeText(getContext(),text,Toast.LENGTH_LONG).show();
 
-                    // store values
-                    Bundle outState = new Bundle();
+                    if(cursor.getString(COL_IP).equals("null")) {
+                        Toast.makeText(getContext(),"No Results Found - Search Again",Toast.LENGTH_LONG).show();
+                    } else {
+                        String text = cursor.getString(COL_IP) + ":" + cursor.getString(COL_PORT) + "/" + cursor.getString(COL_MEDIANAME);
+                        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
 
-                    onSaveInstanceState(outState);
+                        // store values
+                        Bundle outState = new Bundle();
+
+                        onSaveInstanceState(outState);
 
 
+                        // Pass arguments to fragment
+                        Bundle bundle = new Bundle();
+                        bundle.putString("ip_string", cursor.getString(COL_IP));
+                        bundle.putString("port_string", cursor.getString(COL_PORT));
+                        bundle.putString("medianame_string", cursor.getString(COL_MEDIANAME));
 
-                    // Pass arguments to fragment
-                    Bundle bundle = new Bundle();
-                    bundle.putString("ip_string", cursor.getString(COL_IP));
-                    bundle.putString("port_string", cursor.getString(COL_PORT));
-                    bundle.putString("medianame_string", cursor.getString(COL_MEDIANAME));
-
-                    // Intent(FirstScreen.this, SecondScreen.class)
-                    Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
+                        // Intent(FirstScreen.this, SecondScreen.class)
+                        Intent intent = new Intent(getActivity(), MediaPlayerActivity.class);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
                 }
                 mPosition = position;
             }
