@@ -67,7 +67,7 @@ public class MediaPlayer {
     while(true){
 	String line="";
 	line=is.readLine();
-
+        String reply=""; // stores the reply in json format
 	String temp[]=line.split(",");  
 	if(temp[0].equals("ACK")){
 		System.out.println("\nReceived "+temp[0]);
@@ -85,7 +85,15 @@ public class MediaPlayer {
 		System.out.println("\nError. No Match found");
 		}
 		else{
-		System.out.println("\nMedia "+temp[1]+" found");	
+		System.out.println("\nMedia  found");
+		for(int z=0;z<Integer.parseInt(temp[1]);z++)
+		{
+		       
+		       reply=reply.concat(is.readLine());
+		       reply=reply.concat(",");
+		      // System.out.println(reply);	
+		}
+		System.out.println(reply);
 		}
 		break;
 	}
@@ -97,3 +105,4 @@ public class MediaPlayer {
         clientSocket.close();
   }
 }
+
