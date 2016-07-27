@@ -921,9 +921,13 @@ class DBControllerUser {
 				
 				String entry = "{\"name\":\"" + movieName + "\",\"category\":\"" + category + "\"}";
 				
+				//System.out.println("DEBUG: Before entry is " + entry);
+				
 				if(eRS.hasMoreElements()) {
-					entry.concat(",");
+					entry = entry.concat(",");
 				}
+				
+				//System.out.println("DEBUG: After entry is " + entry);
 				
 				returnVector.add(entry);
 				
@@ -935,15 +939,30 @@ class DBControllerUser {
 				System.out.println("---------------------");
 			}
 			
-			System.out.println("DEBUG: returnVector is " + returnVector.toString());
+			// Add trailer to returnVector
+			returnVector.add("]}");
+			
 			
 			// combine into string
-			String combinedReturn = returnVector.toString();
+			String combinedReturn = "";
+			Iterator iter = returnVector.iterator();
+			while (iter.hasNext()) {
+				combinedReturn = combinedReturn + iter.next();
+			}
+			System.out.println("DEBUG: combinedReturn is " + combinedReturn);
+			
 			// clear the vector
 			returnVector.clear();
 			// split and place into vector so that each element is followed by a comma
 			// calling function will add commas back
 			returnVector.addAll(Arrays.asList(combinedReturn.split(",")));
+			
+			/*
+			Iterator iter2 = returnVector.iterator();
+			while (iter2.hasNext()) {
+				System.out.println("DEBUG: returnVector is " + iter2.next());
+			}
+			*/
 			
 			return returnVector;
 		}
