@@ -936,7 +936,14 @@ class DBControllerUser {
 			}
 			
 			System.out.println("DEBUG: returnVector is " + returnVector.toString());
-				
+			
+			// combine into string
+			String combinedReturn = returnVector.toString();
+			// clear the vector
+			returnVector.clear();
+			// split and place into vector so that each element is followed by a comma
+			// calling function will add commas back
+			returnVector.addAll(Arrays.asList(combinedReturn.split(",")));
 			
 			return returnVector;
 		}
