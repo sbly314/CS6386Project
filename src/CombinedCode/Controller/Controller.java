@@ -173,7 +173,7 @@ class clientThread extends Thread {
 	  if(message.equals("search")){ //search moviename-Drama
 	  System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("/");
-	  String response="";
+	  Vector<String> response = new Vector<String>();
 	  if(temp2[0].equals("ALL")){
 	  	  System.out.println("\nSearching for "+temp2[0]+"files in media list\n");
 		  response=dbUser.dbParser(dbUser.queryAll()); // Query All
@@ -187,16 +187,20 @@ class clientThread extends Thread {
 		    response=dbUser.dbParser(dbUser.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
 		 }
 	  }
-	  
-	 String temp3[]=response.split(",");
-	  if(temp3[0].equals("1")){
+	 
+	 String [] str = response.toArray(new String[response.size()]); 
+	 System.out.println("\n\n-------- TESTING-------- ");
+	 for(int ii=0;ii<response.size();ii++){
+			 System.out.println(str[ii]); 
+	 }
+	  /*if(str[0].equals("1")){
 		System.out.println("No match Found. Sending Error code ERR");
 		os.println("FIN,ERR");
 		}
-	  else{
+	  else{*/
 		  System.out.println("Match Found. Sending response in json Format");
-		  os.println("FIN,"+temp3[1]);
-	  }
+		  os.println("FIN,"+str[1]);
+	 // }
 
 	  break;
 	  } 
@@ -980,4 +984,3 @@ class DBConnection {
         return DriverManager.getConnection(url, username, password);
     }
 }
-
