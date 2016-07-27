@@ -50,13 +50,13 @@ public class Update {
 
 
 	System.out.println("\nSending UPDATE");
-	update=update.concat(" ");
+	update=update.concat(",");
 	update=update.concat(media);
 	os.println(update);
     while(true){
 	String line="";
 	line=is.readLine();
-	String temp[]=line.split(" ");  
+	String temp[]=line.split(",");  
 	
 	if(temp[0].equals("FIN")){
 		if(temp[1].equals("ERR")){
