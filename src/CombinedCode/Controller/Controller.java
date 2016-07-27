@@ -171,7 +171,7 @@ class clientThread extends Thread {
 	  } 
 	  int found=0;
 	  if(message.equals("search")){ //search moviename-Drama
-	  System.out.println("\nSearching "+temp[1]+" in media list\n");
+	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("/");
 	  Vector<String> response = new Vector<String>();
 	  if(temp2[0].equals("ALL")){
@@ -189,18 +189,22 @@ class clientThread extends Thread {
 	  }
 	 
 	 String [] str = response.toArray(new String[response.size()]); 
-	 System.out.println("\n\n-------- TESTING-------- ");
-	 for(int ii=0;ii<response.size();ii++){
-			 System.out.println(str[ii]); 
-	 }
-	  /*if(str[0].equals("1")){
+	 //System.out.println("\n\n-------- TESTING-------- ");
+	 //for(int ii=0;ii<response.size();ii++){
+	//		 System.out.println(str[ii]); 
+	 //}
+	  if(str[0].equals("1")){
 		System.out.println("No match Found. Sending Error code ERR");
 		os.println("FIN,ERR");
 		}
-	  else{*/
+	  else{
 		  System.out.println("Match Found. Sending response in json Format");
-		  os.println("FIN,"+str[1]);
-	 // }
+		  os.println("FIN,"+(response.size()-1));
+		  for(int jj=1;jj<response.size();jj++){
+			 //System.out.println(str[jj]);
+			 os.println(str[jj]);
+		  }
+	  }
 
 	  break;
 	  } 
