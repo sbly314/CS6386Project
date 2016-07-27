@@ -218,7 +218,7 @@ class clientThread extends Thread {
 		System.out.println(Controller.mediaList[i]);
 	  }
 	  String temp2[]=temp[1].split("-");
-	  dbController.insertQuery(IP, temp2[0], temp2[1]);
+	  dbController.insertQuery(temp2[0], temp2[1]);
 	  System.out.println("\nSending FIN");
 	  os.println("FIN,"+temp[1]);
 	  break;
@@ -230,7 +230,7 @@ class clientThread extends Thread {
 		if(temp[1].equals(Controller.mediaList[ii])){
 		System.out.println("Match found. Removing Media");
 		String temp2[]=temp[1].split("-");
-		dbController.deleteQuery(IP, temp2[0]);
+		dbController.deleteQuery(temp2[0],temp2[1]);
 		for(int jj=ii;jj<Controller.size-1;jj++){
 			Controller.mediaList[jj]=Controller.mediaList[jj+1];
 		}
