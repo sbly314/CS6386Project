@@ -43,7 +43,7 @@ public class MediaServer {
     // The default port.
     int portNumber = 2222;
     // The default host.
-    String host = "localhost";
+    String host = "129.110.92.16";
 
     if (args.length >= 2) {
       host = args[0];
