@@ -134,7 +134,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
 //            String CONTENTTYPE = "rtsp";
 //            String URL = "wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
             String CONTENTTYPE = "rtsp";
-            String URL = "129.110.92.15:8554/video480p.mkv";
+            String URL = IP + ":" + Port + "/" + MediaName; //"129.110.92.15:8554/video480p.mkv";
 
             Uri MEDIA_STREAM = Uri.parse(CONTENTTYPE + "://" + URL);
 
