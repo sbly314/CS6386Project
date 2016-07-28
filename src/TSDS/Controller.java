@@ -170,11 +170,11 @@ class clientThread extends Thread {
 	  //System.out.println("\nSearching "+temp[1]+" in media list\n");
 	  String temp2[]=temp[1].split("/");
 	  Vector<String> response = new Vector<String>();
-	  if(temp2[0].equals("ALL")){
-	  	  System.out.println("\nSearching for "+temp2[0]+"files in media list\n");
+	  if(temp2[1].equals("All")){
+	  	  System.out.println("\nSearching for All files in media list\n");
 		  response=dbController.dbParser(dbController.queryAll()); // Query All
 	  } else {
-		 if(temp2[0].equals("NONE")){
+		 if(temp2[0].equals("")){
 		 	System.out.println("\nSearching for all files in category "+temp2[1]+"\n");
 			response=dbController.dbParser(dbController.queryCriteria(null, temp2[1])); // Category-only
 		 }
