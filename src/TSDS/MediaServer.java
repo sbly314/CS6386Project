@@ -81,7 +81,7 @@ public class MediaServer {
 	}
 	
 	System.out.println("\nSending SYN");
-	os.println("SYN,10.111.152.13,2223");
+	os.println("SYN,129.110.92.15,8554"); // Media Server
     while(true){
 	String line="";
 	line=is.readLine();
