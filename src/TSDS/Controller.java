@@ -14,7 +14,7 @@ import java.util.*;
  * A chat server that delivers public and private messages.
  */
 public class Controller {
-
+	
   // The server socket.
   private static ServerSocket serverSocket = null;
   // The client socket.
@@ -29,6 +29,7 @@ public class Controller {
   public static int size=0;
   public static String receivedIP="";
   public static String receivedPort="";
+  public static DBController dbController = new DBController();
   public static void main(String args[]) {
 
     // The default port number.
@@ -101,7 +102,7 @@ class clientThread extends Thread {
   public void run() {
     int maxClientsCount = this.maxClientsCount;
     clientThread[] threads = this.threads;
-	DBController dbController = new DBController();
+	
 	InetAddress IP = null;
     try {
 
@@ -120,7 +121,7 @@ class clientThread extends Thread {
 	  Controller.receivedIP=temp[1];
 	  Controller.receivedPort=temp[2];
 	  IP=InetAddress.getByName(Controller.receivedIP);
-	  dbController.newMSConnection(IP, Integer.parseInt(Controller.receivedPort));
+	  Controller.dbController.newMSConnection(IP, Integer.parseInt(Controller.receivedPort));
 	  Controller.mediaServerDB[Controller.serverCount][0]=Integer.toString(Controller.serverCount+1);
 	  Controller.mediaServerDB[Controller.serverCount][1]=Controller.receivedIP;
 	  Controller.mediaServerDB[Controller.serverCount][2]=Controller.receivedPort;
@@ -152,7 +153,7 @@ class clientThread extends Thread {
 	  for(int i=1;i<temp.length;i++){
 		Controller.mediaList[Controller.size]=temp[i];
 		String temp2[]=temp[i].split("-");
-		dbController.insertQuery(temp2[0], temp2[1]);
+		Controller.dbController.insertQuery(temp2[0], temp2[1]);
 		System.out.println(Controller.mediaList[Controller.size]);
 		Controller.size++;
 	  }
@@ -172,15 +173,15 @@ class clientThread extends Thread {
 	  Vector<String> response = new Vector<String>();
 	  if(temp2[1].equals("All")){
 	  	  System.out.println("\nSearching for All files in media list\n");
-		  response=dbController.dbParser(dbController.queryAll()); // Query All
+		  response=Controller.dbController.dbParser(Controller.dbController.queryAll()); // Query All
 	  } else {
 		 if(temp2[0].equals("")){
 		 	System.out.println("\nSearching for all files in category "+temp2[1]+"\n");
-			response=dbController.dbParser(dbController.queryCriteria(null, temp2[1])); // Category-only
+			response=Controller.dbController.dbParser(Controller.dbController.queryCriteria(null, temp2[1])); // Category-only
 		 }
 		 else{
 		 	System.out.println("\nSearching for "+temp2[0]+" in category "+temp2[1]+"\n");
-		    response=dbController.dbParser(dbController.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
+		    response=Controller.dbController.dbParser(Controller.dbController.queryCriteria(temp2[0], temp2[1])); // Category and Media name  
 		 }
 	  }
 	 
@@ -214,7 +215,7 @@ class clientThread extends Thread {
 		System.out.println(Controller.mediaList[i]);
 	  }
 	  String temp2[]=temp[1].split("-");
-	  dbController.insertQuery(temp2[0], temp2[1]);
+	  Controller.dbController.insertQuery(temp2[0], temp2[1]);
 	  System.out.println("\nSending FIN");
 	  os.println("FIN,"+temp[1]);
 	  break;
@@ -226,7 +227,7 @@ class clientThread extends Thread {
 		if(temp[1].equals(Controller.mediaList[ii])){
 		System.out.println("Match found. Removing Media");
 		String temp2[]=temp[1].split("-");
-		dbController.deleteQuery(temp2[0],temp2[1]);
+		Controller.dbController.deleteQuery(temp2[0],temp2[1]);
 		for(int jj=ii;jj<Controller.size-1;jj++){
 			Controller.mediaList[jj]=Controller.mediaList[jj+1];
 		}
@@ -281,6 +282,8 @@ class clientThread extends Thread {
  *
  */
 class DBController {
+	private static final boolean DEBUG = true;
+	
 	// variables to hold Media Server IP and Port
 	private String serverIP;
 	private int serverPort;
@@ -556,22 +559,13 @@ class DBController {
 	 * This method queries for specific criteria
 	 */
 	public Vector<Vector<String>> queryCriteria(String movieNameCrit, String categoryCrit) {
+		if (DEBUG) System.out.println("queryCriteria(" + movieNameCrit + ", " + categoryCrit + ")" );
+		
 		Vector<Vector<String>> results = new Vector<Vector<String>>();
 		
-		if(categoryCrit.compareTo(COMEDY) == 0) {
-			results = queryFile(movieNameCrit, categoryCrit, ComedyFiles);
-		} else if (categoryCrit.compareTo(DRAMA) == 0) {
-			results = queryFile(movieNameCrit, categoryCrit, DramaFiles);
-		} else if (categoryCrit.compareTo(HORROR) == 0) {
-			results = queryFile(movieNameCrit, categoryCrit, HorrorFiles);
-		} else if (categoryCrit.compareTo(ROMANCE) == 0) {
-			results = queryFile(movieNameCrit, categoryCrit, RomanceFiles);
-		} else if (categoryCrit.compareTo(FICTION) == 0) {
-			results = queryFile(movieNameCrit, categoryCrit, FictionFiles);
-		} else {
-			System.out.println("ERROR: Unknown categoryCrit");
-			results = null;
-		}
+		results = queryFile(movieNameCrit, categoryCrit);
+		
+		if (DEBUG) printParserOutput(dbParser(results));
 		
 		return results;
 	}
@@ -587,13 +581,8 @@ class DBController {
 	 * 
 	 * This method queries individual file
 	 */
-	public Vector<Vector<String>> queryFile(String movieNameCrit, String categoryCrit, Vector<String> fileName) {
+	public Vector<Vector<String>> queryFile(String movieNameCrit, String categoryCrit) {
 		Vector<Vector<String>> results = new Vector<Vector<String>>();
-		
-		if(fileName.isEmpty()) {
-			// Nothing to search
-			return null;
-		}
 		
 		if (movieNameCrit == null) {
 			if(categoryCrit.compareTo(COMEDY) == 0) {
@@ -613,9 +602,30 @@ class DBController {
 		} else {
 			CharSequence cs = (CharSequence) movieNameCrit;
 			
-			Iterator iter = fileName.iterator();
+			if (DEBUG) System.out.println("CharSequence is " + cs);
+			
+			Iterator iter = null;
+			
+			if(categoryCrit.compareTo(COMEDY) == 0) {
+				iter = ComedyFiles.iterator();
+			} else if (categoryCrit.compareTo(DRAMA) == 0) {
+				iter = DramaFiles.iterator();
+			} else if (categoryCrit.compareTo(HORROR) == 0) {
+				iter = HorrorFiles.iterator();
+			} else if (categoryCrit.compareTo(ROMANCE) == 0) {
+				iter = RomanceFiles.iterator();
+			} else if (categoryCrit.compareTo(FICTION) == 0) {
+				iter = FictionFiles.iterator();
+			} else {
+				System.out.println("ERROR: Unknown categoryCrit");
+				results = null;
+				return results;
+			}
+			
 			while (iter.hasNext()) {
 				String tmp = (String) iter.next();
+				
+				if (DEBUG) System.out.println("DEBUG: iter.next is " + tmp);
 				
 				if(tmp.contains(cs)) {
 					Vector<String>row = new Vector<String>();
@@ -636,20 +646,77 @@ class DBController {
 		return results;
 	}
 	
-	boolean existsInFile(String mediaName, Vector<String> fileName) {
+	boolean existsInFile(String mediaName, String category) {
 		boolean exists = false;
 		
-		if(!fileName.isEmpty()) {
-			Iterator iter = fileName.iterator();
-			while (iter.hasNext()) {
-				String tmp = (String) iter.next();
-				
-				if(tmp.compareTo(mediaName) == 0) {
-					exists = true;
-					return exists;
+		
+		if(category.compareTo(COMEDY) == 0) {
+			if(!ComedyFiles.isEmpty()) {
+				Iterator iter = ComedyFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					
+					if(tmp.compareTo(mediaName) == 0) {
+						exists = true;
+						return exists;
+					}
 				}
 			}
+		} else if (category.compareTo(DRAMA) == 0) {
+			if(!DramaFiles.isEmpty()) {
+				Iterator iter = DramaFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					
+					if(tmp.compareTo(mediaName) == 0) {
+						exists = true;
+						return exists;
+					}
+				}
+			}
+		} else if (category.compareTo(HORROR) == 0) {
+			if(!HorrorFiles.isEmpty()) {
+				Iterator iter = HorrorFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					
+					if(tmp.compareTo(mediaName) == 0) {
+						exists = true;
+						return exists;
+					}
+				}
+			}
+		} else if (category.compareTo(ROMANCE) == 0) {
+			if(!RomanceFiles.isEmpty()) {
+				Iterator iter = RomanceFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					
+					if(tmp.compareTo(mediaName) == 0) {
+						exists = true;
+						return exists;
+					}
+				}
+			}
+		} else if (category.compareTo(FICTION) == 0) {
+			if(!FictionFiles.isEmpty()) {
+				Iterator iter = FictionFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					
+					if(tmp.compareTo(mediaName) == 0) {
+						exists = true;
+						return exists;
+					}
+				}
+			}
+		} else {
+			System.out.println("ERROR: Unknown category");
+			exists = false;
+			return exists;
 		}
+		
+		
 		
 		return exists;
 	}
@@ -683,41 +750,60 @@ class DBController {
 	 * This method is also called on update of a new movie
 	 */
 	int insertQuery(String movieName, String category) {
+		if (DEBUG) System.out.println("insertQuery(" + movieName + ", " + category + ")" );
+		
 		int successFlag = 0; // 0 = False (Fail); 1 = True (Success)
 		
 		if(category.compareTo(COMEDY) == 0) {
-			if(existsInFile(movieName, ComedyFiles)) {
+			if(existsInFile(movieName, COMEDY)) {
 				successFlag = 0;
 				return successFlag;
 			} else {
+				if (DEBUG) System.out.println("Successfully added to ComedyFiles");
 				ComedyFiles.add(movieName);
 			}
 		} else if (category.compareTo(DRAMA) == 0) {
-			if(existsInFile(movieName, DramaFiles)) {
+			if(existsInFile(movieName, DRAMA)) {
 				successFlag = 0;
 				return successFlag;
 			} else {
+				if (DEBUG) System.out.println("Successfully added to DramaFiles");
 				DramaFiles.add(movieName);
+				
+				Iterator iter = DramaFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					System.out.println("DEBUG: DramaFiles contains: " + tmp);
+				}
+				
+				iter = DramaFiles.iterator();
+				while (iter.hasNext()) {
+					String tmp = (String) iter.next();
+					System.out.println("DEBUG: DramaFiles contains: " + tmp);
+				}
 			}
 		} else if (category.compareTo(HORROR) == 0) {
-			if(existsInFile(movieName, HorrorFiles)) {
+			if(existsInFile(movieName, HORROR)) {
 				successFlag = 0;
 				return successFlag;
 			} else {
+				if (DEBUG) System.out.println("Successfully added to HorrorFiles");
 				HorrorFiles.add(movieName);
 			}
 		} else if (category.compareTo(ROMANCE) == 0) {
-			if(existsInFile(movieName, RomanceFiles)) {
+			if(existsInFile(movieName, ROMANCE)) {
 				successFlag = 0;
 				return successFlag;
 			} else {
+				if (DEBUG) System.out.println("Successfully added to RomanceFiles");
 				RomanceFiles.add(movieName);
 			}
 		} else if (category.compareTo(FICTION) == 0) {
-			if(existsInFile(movieName, FictionFiles)) {
+			if(existsInFile(movieName, FICTION)) {
 				successFlag = 0;
 				return successFlag;
 			} else {
+				if (DEBUG) System.out.println("Successfully added to FictionFiles");
 				FictionFiles.add(movieName);
 			}
 		} else {
@@ -742,7 +828,7 @@ class DBController {
 		int successFlag = 0; // 0 = False (Fail); 1 = True (Success)
 		
 		if(category.compareTo(COMEDY) == 0) {
-			if(existsInFile(movieName, ComedyFiles)) {
+			if(existsInFile(movieName, COMEDY)) {
 				Iterator iter = ComedyFiles.iterator();
 				while (iter.hasNext()) {
 					String tmp = (String) iter.next();
@@ -757,7 +843,7 @@ class DBController {
 				return successFlag;
 			}
 		} else if (category.compareTo(DRAMA) == 0) {
-			if(existsInFile(movieName, DramaFiles)) {
+			if(existsInFile(movieName, DRAMA)) {
 				Iterator iter = DramaFiles.iterator();
 				while (iter.hasNext()) {
 					String tmp = (String) iter.next();
@@ -772,7 +858,7 @@ class DBController {
 				return successFlag;
 			}
 		} else if (category.compareTo(HORROR) == 0) {
-			if(existsInFile(movieName, HorrorFiles)) {
+			if(existsInFile(movieName, HORROR)) {
 				Iterator iter = HorrorFiles.iterator();
 				while (iter.hasNext()) {
 					String tmp = (String) iter.next();
@@ -787,7 +873,7 @@ class DBController {
 				return successFlag;
 			}
 		} else if (category.compareTo(ROMANCE) == 0) {
-			if(existsInFile(movieName, RomanceFiles)) {
+			if(existsInFile(movieName, ROMANCE)) {
 				Iterator iter = RomanceFiles.iterator();
 				while (iter.hasNext()) {
 					String tmp = (String) iter.next();
@@ -802,7 +888,7 @@ class DBController {
 				return successFlag;
 			}
 		} else if (category.compareTo(FICTION) == 0) {
-			if(existsInFile(movieName, FictionFiles)) {
+			if(existsInFile(movieName, FICTION)) {
 				Iterator iter = FictionFiles.iterator();
 				while (iter.hasNext()) {
 					String tmp = (String) iter.next();
