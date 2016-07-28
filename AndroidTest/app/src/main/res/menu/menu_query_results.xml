@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.utd.sysdproject.cs6386project.QueryResults">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="@string/search_icon"
+        app:showAsAction="ifRoom|collapseActionView" />
+    <!-- When read, use actionViewClass and point to View for Search Page -->
+    <!-- https://developer.android.com/guide/topics/resources/menu-resource.html -->
+    <!-- https://developer.android.com/reference/android/widget/SearchView.html -->
+    <!-- app:actionViewClass="android.support.v7.widget.SearchView" -->
+</menu>

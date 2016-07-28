@@ -1,0 +1,23 @@
+<resources>
+    <!-- Name of Application -->
+    <string name="app_name">CS6386Project</string>
+
+    <!-- Name of Search page -->
+    <string name="media_search_title">Media Search</string>
+    <!-- Name of Search icon -->
+    <string name="search_icon">Search</string>
+
+    <!-- Search labels on page -->
+    <string name="search_media_title">Enter Media Title</string>
+    <string name="search_media_hint">Search...</string>
+    <string name="search_media_category">Select Media Category</string>
+    <string name="search_button">Search</string>
+
+
+    <string name="search_results_title">Search Results</string>
+    <string name="title_activity_query_results">QueryResults</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_media_player">MediaPlayerActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+</resources>

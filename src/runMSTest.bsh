@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mysql -u root -padmin < resetDB.sql
+
+java sdsproject.DBControllerMS
