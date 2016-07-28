@@ -282,7 +282,7 @@ class clientThread extends Thread {
  *
  */
 class DBController {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	
 	// variables to hold Media Server IP and Port
 	private String serverIP;
@@ -421,7 +421,7 @@ class DBController {
 		}
 		
 		// check if all of the files are empty
-		if (results.isEmpty()) {
+		if (results == null || results.isEmpty()) {
 			results = null;
 		}
 		
@@ -639,7 +639,7 @@ class DBController {
 		}
 		
 		// check if no results found
-		if (results.isEmpty()) {
+		if (results == null || results.isEmpty()) {
 			results = null;
 		}
 		
@@ -769,18 +769,6 @@ class DBController {
 			} else {
 				if (DEBUG) System.out.println("Successfully added to DramaFiles");
 				DramaFiles.add(movieName);
-				
-				Iterator iter = DramaFiles.iterator();
-				while (iter.hasNext()) {
-					String tmp = (String) iter.next();
-					System.out.println("DEBUG: DramaFiles contains: " + tmp);
-				}
-				
-				iter = DramaFiles.iterator();
-				while (iter.hasNext()) {
-					String tmp = (String) iter.next();
-					System.out.println("DEBUG: DramaFiles contains: " + tmp);
-				}
 			}
 		} else if (category.compareTo(HORROR) == 0) {
 			if(existsInFile(movieName, HORROR)) {
@@ -941,11 +929,7 @@ class DBController {
 		
 		String errMessage = "1";
 		
-		if ( rs == null) {
-			System.out.println("No movies matched your criteria");
-			returnVector.add(errMessage);
-			return returnVector;
-		} else if (rs.isEmpty()) {
+		if (rs == null || rs.isEmpty()) {
 			System.out.println("No movies matched your criteria");
 			returnVector.add(errMessage);
 			return returnVector;
