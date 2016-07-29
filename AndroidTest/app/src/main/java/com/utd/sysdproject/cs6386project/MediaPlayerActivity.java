@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -22,6 +23,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     private int position = 0;
     private ProgressDialog progressDialog;
     private MediaController mediaControls;
+    private static final int seekTime = 5000; // milliseconds
 
 
 //    /**
@@ -132,11 +134,31 @@ public class MediaPlayerActivity extends AppCompatActivity {
             // set the media controller in the videoView
             vidView.setMediaController(mediaControls);
 
+            mediaControls.setPrevNextListeners(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //next
+                    //view is mediaControls
+                    int pos = vidView.getCurrentPosition();
+                    pos += seekTime;
+                    vidView.seekTo(pos);
+                }
+            }, new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //prev
+                    //view is mediaControls
+                    int pos = vidView.getCurrentPosition();
+                    pos -= seekTime;
+                    vidView.seekTo(pos);
+                }
+            });
+
             // for testing
 //            String CONTENTTYPE = "rtsp";
 //            String URL = "wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
             String CONTENTTYPE = "rtsp";
-            String URL = IP + ":" + Port + "/" + MediaName; //"129.110.92.15:8554/video480p.mkv";
+            String URL = IP + ":" + Port + "/" + MediaName;
 
             Uri MEDIA_STREAM = Uri.parse(CONTENTTYPE + "://" + URL);
 
