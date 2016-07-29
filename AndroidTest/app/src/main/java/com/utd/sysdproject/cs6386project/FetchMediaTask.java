@@ -99,7 +99,7 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private void getMediaDataFromJson(String mediaJsonStr) throws JSONException {
+    private void getMediaDataFromJson(String mediaJsonStr) {
         // Now we have a String representing the complete media list in JSON Format.
         // Fortunately parsing is easy:  constructor takes the JSON string and converts it
         // into an Object hierarchy for us.
@@ -119,6 +119,8 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
 
         try {
             JSONObject mediaJson = new JSONObject(mediaJsonStr);
+
+            Log.d(LOG_TAG, "DEBUG: mediaJsonStr is " + mediaJsonStr);
 
             String ip = mediaJson.getString(CONTROLLER_IP);
             String port = mediaJson.getString(CONTROLLER_PORT);
@@ -192,10 +194,16 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
             String mediaQuery = params[0];
             String categoryQuery = params[1];
 
+            Log.d(LOG_TAG, "DEBUG: mediaQuery is " + mediaQuery + " and categoryQuery is " + categoryQuery);
+
             try {
+                Log.d(LOG_TAG, "DEBUG: About to call Socket(" + host + ", " + portNumber + ")");
                 clientSocket = new Socket(host, portNumber);
+                Log.d(LOG_TAG, "DEBUG: Finished calling Socket(" + host + ", " + portNumber + ")");
                 is = new DataInputStream(clientSocket.getInputStream());
                 os = new PrintStream(clientSocket.getOutputStream());
+
+                Log.d(LOG_TAG, "DEBUG: received InputStream and OutputStream");
 
                 // Send Sync message
                 // os.println("search");
@@ -205,10 +213,14 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
                 search = search.concat(media);
                 os.println(search);
 
+                Log.d(LOG_TAG, "DEBUG: search message is " + search);
+
                 Vector<String> resultsVector = new Vector<String>();
 
                 String line = "";
                 line = is.readLine();
+
+                Log.d(LOG_TAG, "DEBUG: line is " + line);
 
                 String temp[] = line.split(",");
 
@@ -219,7 +231,10 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
                         Log.d(LOG_TAG, "DEBUG: FIN,ERR received");
 
                         // display No Results message in database
-                        String mediaJson = "{\"medialist\":[{\"name\":\"No Data Found\",\"category\":\"\",\"ip\":\"null\",\"port\":\"null\"}]}";
+                        String mediaJson = "{\"ip\":\"null\",\"port\":\"null\",\"medialist\":[{\"name\":\"No Data Found\",\"category\":\"\"}]}";
+
+                        Log.d(LOG_TAG, "DEBUG: mediaJson is " + mediaJson);
+
                         getMediaDataFromJson(mediaJson);
                     } else {
                         Log.d(LOG_TAG, "DEBUG: FIN, " + receivedLine + " received");
@@ -249,101 +264,18 @@ public class FetchMediaTask extends AsyncTask<String, Void, Void> {
                     }
                 }
             } catch (UnknownHostException e) {
-                Log.e(LOG_TAG, "Unknown host " + host);
+                Log.e(LOG_TAG, "DEBUG: Unknown host " + host);
             } catch (IOException e) {
-                Log.e(LOG_TAG, "IOEXCEPTION: Couldn't get I/O for connection to host " + host);
-                Log.e(LOG_TAG, "IOEXCEPTION: " + e.getMessage());
+                Log.e(LOG_TAG, "DEBUG: IOEXCEPTION: Couldn't get I/O for connection to host " + host);
+                Log.e(LOG_TAG, "DEBUG: IOEXCEPTION: " + e.getMessage());
+                String mediaJson = "{\"ip\":\"null\",\"port\":\"null\",\"medialist\":[{\"name\":\"Cannot connect to Controller.\",\"category\":\"Verify VPN Connected\"}]}";
+                getMediaDataFromJson(mediaJson);
             } catch (NullPointerException e) {
-                Log.e(LOG_TAG, "NullPointerException from host " + host);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
+                Log.e(LOG_TAG, "DEBUG: NullPointerException from host " + host);
             }
-
-
-
-
-//            // These two need to be declared outside the try/catch
-//            // so that they can be closed in the finally block.
-//            HttpURLConnection urlConnection = null;
-//            BufferedReader reader = null;
-//
-//            // Will contain the raw JSON response as a string.
-//            String mediaJsonStr = null;
-//
-//            try {
-//                // Construct the URL
-//                final String BASE_URL = "http://10.28.34.150:5984/jsontest/mediadb/";
-//                //            final String QUERY_PARAM = "q";
-//                //            final String MEDIA_PARAM = "medianame";
-//                //            final String CATEGORY_PARAM = "cat";
-//                //
-//                //            Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-//                //                    .appendQueryParameter(MEDIA_PARAM, mediaQuery)
-//                //                    .appendQueryParameter(CATEGORY_PARAM, categoryQuery)
-//                //                    .build();
-//                Uri builtUri = Uri.parse(BASE_URL).buildUpon().build();
-//
-//                URL url = new URL(builtUri.toString());
-//
-//                // Create the request to the Controller, and open the connection
-//                urlConnection = (HttpURLConnection) url.openConnection();
-//                urlConnection.setRequestMethod("GET");
-//                urlConnection.connect();
-//
-//                // Read the input stream into a String
-//                InputStream inputStream = urlConnection.getInputStream();
-//                StringBuffer buffer = new StringBuffer();
-//                if (inputStream == null) {
-//                    // Nothing to do.
-//                    return null;
-//                }
-//                reader = new BufferedReader(new InputStreamReader(inputStream));
-//
-//                String line;
-//
-//                while ((line = reader.readLine()) != null) {
-//                    // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
-//                    // But it does make debugging a *lot* easier if you print out the completed
-//                    // buffer for debugging.
-//                    buffer.append(line + "\n");
-//                }
-//
-//                if (buffer.length() == 0) {
-//                    // Stream was empty.  No point in parsing.
-//                    return null;
-//                }
-//
-//                Log.d(LOG_TAG, "DEBUG: JSON Buffer is: " + buffer.toString());
-//
-//                mediaJsonStr = buffer.toString();
-//                getMediaDataFromJson(mediaJsonStr);
-//            } catch (IOException e) {
-//                Log.e(LOG_TAG, "Error ", e);
-//                // If the code didn't successfully get the media data, there's no point in attempting
-//                // to parse it.
-//            } catch (JSONException e) {
-//                Log.e(LOG_TAG, e.getMessage(), e);
-//                e.printStackTrace();
-//            } finally {
-//                if (urlConnection != null) {
-//                    urlConnection.disconnect();
-//                }
-//                if (reader != null) {
-//                    try {
-//                        reader.close();
-//                    } catch (final IOException e) {
-//                        Log.e(LOG_TAG, "Error closing stream", e);
-//                    }
-//                }
-//            }
         } else {
-            try {
-                String mediaJsonStr = "{\"medialist\":[{\"name\":\"TestName\",\"category\":\"TestCategory\",\"ip\":\"10.1.2.1\",\"port\":\"3456\"}]}\n";
-                getMediaDataFromJson(mediaJsonStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, "test error");
-            }
+            String mediaJsonStr = "{\"medialist\":[{\"name\":\"TestName\",\"category\":\"TestCategory\",\"ip\":\"10.1.2.1\",\"port\":\"3456\"}]}\n";
+            getMediaDataFromJson(mediaJsonStr);
         }
         return null;
     }

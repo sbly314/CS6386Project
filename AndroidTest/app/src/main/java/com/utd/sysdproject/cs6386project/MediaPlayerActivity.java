@@ -1,12 +1,14 @@
 package com.utd.sysdproject.cs6386project;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.MediaController;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 /**
@@ -161,6 +163,20 @@ public class MediaPlayerActivity extends AppCompatActivity {
                     // if we come from a resumed activity, video playback will be paused
                     vidView.pause();
                 }
+            }
+        });
+
+        vidView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
+                String text = "Can't play video.  Please select another video";
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+
+                // Return home
+                // Intent(FirstScreen.this, SecondScreen.class)
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                return true;
             }
         });
     }

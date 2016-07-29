@@ -186,7 +186,7 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
                         Toast.makeText(getContext(),"No Results Found - Search Again",Toast.LENGTH_LONG).show();
                     } else {
                         String text = cursor.getString(COL_IP) + ":" + cursor.getString(COL_PORT) + "/" + cursor.getString(COL_MEDIANAME);
-                        Toast.makeText(getContext(), text, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
 
                         // store values
                         Bundle outState = new Bundle();
