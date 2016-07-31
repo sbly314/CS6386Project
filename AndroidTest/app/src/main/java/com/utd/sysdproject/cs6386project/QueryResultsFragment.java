@@ -185,7 +185,7 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
                     if(cursor.getString(COL_IP).equals("null")) {
                         Toast.makeText(getContext(),"No Results Found - Search Again",Toast.LENGTH_LONG).show();
                     } else {
-                        String text = cursor.getString(COL_IP) + ":" + cursor.getString(COL_PORT) + "/" + cursor.getString(COL_MEDIANAME);
+                        String text = cursor.getString(COL_IP) + ":" + cursor.getString(COL_PORT) + "/" + cursor.getString(COL_CATEGORY) + "/" + cursor.getString(COL_MEDIANAME);
                         Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
 
                         // store values
@@ -198,6 +198,7 @@ public class QueryResultsFragment extends Fragment implements LoaderManager.Load
                         Bundle bundle = new Bundle();
                         bundle.putString("ip_string", cursor.getString(COL_IP));
                         bundle.putString("port_string", cursor.getString(COL_PORT));
+                        bundle.putString("category_string", cursor.getString(COL_CATEGORY));
                         bundle.putString("medianame_string", cursor.getString(COL_MEDIANAME));
 
                         // Intent(FirstScreen.this, SecondScreen.class)

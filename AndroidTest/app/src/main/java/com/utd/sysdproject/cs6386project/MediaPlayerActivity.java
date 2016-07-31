@@ -106,9 +106,10 @@ public class MediaPlayerActivity extends AppCompatActivity {
 
         String IP = extras.getString("ip_string");
         String Port = extras.getString("port_string");
+        String Category = extras.getString("category_string");
         String MediaName = extras.getString("medianame_string");
 
-        Log.d(LOG_TAG, "DEBUG: Received from QueryResultsFragment... " + IP + ":" + Port + "/" + MediaName);
+        Log.d(LOG_TAG, "DEBUG: Received from QueryResultsFragment... " + IP + ":" + Port + "/" + Category + "/" + MediaName);
 
 
         // set the media controller buttons
@@ -158,7 +159,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
 //            String CONTENTTYPE = "rtsp";
 //            String URL = "wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
             String CONTENTTYPE = "rtsp";
-            String URL = IP + ":" + Port + "/" + MediaName;
+            String URL = IP + ":" + Port + "/" + Category + "/" + MediaName;
 
             Uri MEDIA_STREAM = Uri.parse(CONTENTTYPE + "://" + URL);
 
