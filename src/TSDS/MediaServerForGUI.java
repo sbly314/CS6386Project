@@ -111,7 +111,6 @@ class clientThread extends Thread {
 			
 			String dir = System.getProperty("user.dir");
 			dir += "/live/mediaServer/";
-			System.out.println("dir is " + dir);
 			
 			
 			
